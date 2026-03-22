@@ -9,7 +9,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
     
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
@@ -28,22 +28,11 @@
                     },
                     colors: {
                         primary: {
-                            DEFAULT: '#193db3', // Azul Institucional
-                            dark: '#0f267a',
-                            light: '#4d6be6'
+                            DEFAULT: '#1e40af', // Azul Institucional forte
+                            dark: '#1e3a8a',
+                            light: '#3b82f6'
                         },
-                        secondary: '#111827',
-                        accent: '#e0f2fe',
-                    },
-                    animation: {
-                        'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
-                        'bounce-slow': 'bounce 2s infinite',
-                    },
-                    keyframes: {
-                        fadeInUp: {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        }
+                        secondary: '#475569', // Cinza ardósia para texto secundário
                     }
                 }
             }
@@ -51,379 +40,848 @@
     </script>
 
     <style>
-        /* Estilos Personalizados - Efeito Vidro (Glassmorphism) */
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+        /* Estilos Base - Clean & Corporate */
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        .glass-panel-dark {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Scrollbar personalizada */
-        .custom-scrollbar::-webkit-scrollbar {
+        /* Custom Scrollbar mais discreta */
+        ::-webkit-scrollbar {
             width: 8px;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
+        ::-webkit-scrollbar-track {
+            background: #f8fafc;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
+        ::-webkit-scrollbar-thumb {
             background: #cbd5e1;
             border-radius: 4px;
         }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        ::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
-        
-        /* Utilitário para ocultar scrollbar mas permitir scroll */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+
+        /* Efeito de hover suave nas imagens do catálogo */
+        .catalog-card img {
+            transition: transform 0.5s ease;
         }
-        .no-scrollbar {
-            -ms-overflow-style: none;  /* IE and Edge */
-            scrollbar-width: none;  /* Firefox */
+        .catalog-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Modal Overlay Transition */
+        .modal-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-content {
+            transition: all 0.3s ease-in-out;
+        }
+
+        /* --- Animação das Ondas SVG --- */
+        .waves {
+            position: absolute;
+            width: 100%;
+            height: 15vh;
+            min-height: 100px;
+            max-height: 150px;
+            bottom: -1px; /* Evita uma linha fina entre as secções */
+            left: 0;
+            z-index: 1;
+        }
+        .parallax > use {
+            animation: move-forever 25s cubic-bezier(.55,.5,.45,.5) infinite;
+        }
+        .parallax > use:nth-child(1) { animation-delay: -2s; animation-duration: 7s; }
+        .parallax > use:nth-child(2) { animation-delay: -3s; animation-duration: 10s; }
+        .parallax > use:nth-child(3) { animation-delay: -4s; animation-duration: 13s; }
+        .parallax > use:nth-child(4) { animation-delay: -5s; animation-duration: 20s; }
+        
+        @keyframes move-forever {
+            0% { transform: translate3d(-90px,0,0); }
+            100% { transform: translate3d(85px,0,0); }
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased overflow-x-hidden selection:bg-primary/20 selection:text-primary">
+<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen relative">
 
-    <!-- Navegação -->
-    <nav class="fixed w-full z-50 transition-all duration-300 px-4 py-4" id="navbar">
-        <div class="max-w-7xl mx-auto">
-            <div class="glass-panel rounded-2xl px-6 py-3 flex justify-between items-center shadow-lg transition-all duration-300" id="navbar-inner">
+    <!-- Header / Navbar Dinâmica -->
+    <header id="header" class="fixed w-full z-50 bg-white shadow-sm border-b border-slate-200 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
                 
                 <!-- Logo -->
-                <a href="#" class="flex items-center gap-3 group">
-                    <img src="https://i.postimg.cc/hvLM4TvL/IMG-E7740.jpg" alt="JFC Seafood Logo" class="h-10 w-10 rounded-full object-cover shadow-sm group-hover:scale-105 transition-transform border border-white">
-                    <div class="hidden sm:block">
-                        <h1 class="text-xl font-black tracking-tighter text-primary leading-none">JFC Seafood</h1>
+                <a href="#" class="flex items-center gap-4 group">
+                    <img src="https://i.postimg.cc/hvLM4TvL/IMG-E7740.jpg" alt="JFC Seafood Logo" class="h-12 w-12 rounded-full object-cover border border-slate-200 shadow-sm">
+                    <div>
+                        <h1 class="text-2xl font-black tracking-tight text-primary leading-none">JFC Seafood</h1>
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-widest hidden sm:block">Produtos alimentares </span>
                     </div>
                 </a>
 
                 <!-- Desktop Menu -->
-                <div class="hidden md:flex items-center gap-8 font-semibold text-sm text-slate-600">
-                    <a href="#about" class="hover:text-primary transition-colors relative group">
-                        Sobre Nós
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
-                    </a>
-                    <a href="#quality" class="hover:text-primary transition-colors relative group">
-                        Compromisso
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
-                    </a>
-                    <a href="#catalog" class="hover:text-primary transition-colors relative group">
-                        Catálogo
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
-                    </a>
-                    <a href="#sectors" class="hover:text-primary transition-colors relative group">
-                        Setores
-                        <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
-                    </a>
-                </div>
+                <nav class="hidden md:flex items-center gap-8 font-medium text-sm text-slate-600">
+                    <a href="#about" class="hover:text-primary transition-colors">Sobre Nós</a>
+                    <a href="#quality" class="hover:text-primary transition-colors">Compromisso</a>
+                    <a href="#logistica" class="hover:text-primary transition-colors">Logística</a>
+                    <a href="#catalog" class="hover:text-primary transition-colors">Catálogo</a>
+                    <a href="#sectors" class="hover:text-primary transition-colors">Setores</a>
+                </nav>
 
-                <!-- CTA & Mobile Toggle -->
+                <!-- Call to Action & Mobile Button -->
                 <div class="flex items-center gap-4">
-                    <a href="#contact" class="hidden md:flex bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg hover:shadow-blue-500/30 items-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0">
-                        <span class="material-symbols-outlined text-[18px]">mail</span>
+                    <a href="#contact" class="hidden md:flex bg-primary hover:bg-primary-dark text-white px-6 py-2.5 rounded-md font-semibold text-sm transition-colors items-center gap-2 shadow-sm">
+                        <span class="material-symbols-outlined text-[20px]">call</span>
                         Contactar
                     </a>
                     
-                    <button id="mobile-menu-btn" class="md:hidden p-2 text-slate-600 hover:text-primary transition-colors rounded-lg hover:bg-slate-100">
+                    <button id="mobile-menu-btn" class="md:hidden p-2 text-slate-600 hover:text-primary hover:bg-slate-100 rounded-md transition-colors" aria-label="Abrir menu">
                         <span class="material-symbols-outlined text-3xl">menu</span>
                     </button>
                 </div>
             </div>
+        </div>
 
-            <!-- Mobile Menu Dropdown -->
-            <div id="mobile-menu" class="hidden absolute top-full left-0 w-full px-4 mt-2 transition-all duration-300 origin-top">
-                <div class="glass-panel rounded-2xl p-4 flex flex-col gap-2 shadow-xl animate-fade-in-up">
-                    <a href="#about" class="block px-4 py-3 rounded-lg hover:bg-white/50 font-bold text-slate-700 hover:text-primary transition-colors">Sobre Nós</a>
-                    <a href="#quality" class="block px-4 py-3 rounded-lg hover:bg-white/50 font-bold text-slate-700 hover:text-primary transition-colors">Compromisso</a>
-                    <a href="#catalog" class="block px-4 py-3 rounded-lg hover:bg-white/50 font-bold text-slate-700 hover:text-primary transition-colors">Catálogo</a>
-                    <a href="#sectors" class="block px-4 py-3 rounded-lg hover:bg-white/50 font-bold text-slate-700 hover:text-primary transition-colors">Setores</a>
-                    <a href="#contact" class="block px-4 py-3 rounded-lg bg-primary/10 text-primary font-bold text-center mt-2">Contactos</a>
-                </div>
+        <!-- Mobile Menu Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-slate-100 shadow-lg absolute w-full left-0">
+            <div class="px-4 py-6 space-y-4">
+                <a href="#about" class="block font-semibold text-slate-700 hover:text-primary p-2">Sobre Nós</a>
+                <a href="#quality" class="block font-semibold text-slate-700 hover:text-primary p-2">Compromisso</a>
+                <a href="#logistica" class="block font-semibold text-slate-700 hover:text-primary p-2">Logística</a>
+                <a href="#catalog" class="block font-semibold text-slate-700 hover:text-primary p-2">Catálogo</a>
+                <a href="#sectors" class="block font-semibold text-slate-700 hover:text-primary p-2">Setores</a>
+                <a href="#contact" class="block bg-primary text-white text-center font-bold py-3 rounded-md mt-4">Contactar Agora</a>
             </div>
         </div>
-    </nav>
+    </header>
 
-    <!-- Hero Section -->
-    <section class="relative min-h-screen flex items-center pt-20 pb-10 px-4 overflow-hidden">
-        <!-- Imagem de Fundo com Overlay e Parallax suave (simulado) -->
-        <div class="absolute inset-0 z-0">
-            <img src="https://i.postimg.cc/65MVLHd7/Gemini-Generated-Image-4zms8c4zms8c4zms.png" alt="Oceano Profundo" class="w-full h-full object-cover scale-105">
-            <div class="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/40 to-slate-900/10"></div>
-        </div>
+    <!-- Hero Section (Corporate Premium) -->
+    <section class="relative bg-gradient-to-br from-slate-900 via-primary-dark to-slate-900 pt-20 h-[80vh] min-h-[600px] flex items-center overflow-hidden" id="hero-section">
+        
+        <!-- Canvas para os Peixes Interativos (Agora limitados apenas a esta secção) -->
+        <canvas id="fishCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-0 mix-blend-screen opacity-50"></canvas>
 
-        <div class="container mx-auto max-w-7xl relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            <div class="text-white space-y-8 animate-fade-in-up">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 backdrop-blur-md text-xs font-bold uppercase tracking-widest text-blue-200">
-                    <span class="w-2 h-2 rounded-full bg-blue-400 animate-ping absolute opacity-75"></span>
-                    <span class="w-2 h-2 rounded-full bg-blue-400 relative"></span>
-                    Soluções para todos
+        <!-- Fundo de Ondas Animadas (Substitui a imagem estática) -->
+        <svg class="waves" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+        viewBox="0 24 150 28" preserveAspectRatio="none" shape-rendering="auto">
+            <defs>
+                <path id="gentle-wave" d="M-160 44c30 0 58-18 88-18s 58 18 88 18 58-18 88-18 58 18 88 18 v44h-352z" />
+            </defs>
+            <g class="parallax">
+                <use xlink:href="#gentle-wave" x="48" y="0" fill="rgba(30, 64, 175, 0.5)" />
+                <use xlink:href="#gentle-wave" x="48" y="3" fill="rgba(59, 130, 246, 0.3)" />
+                <use xlink:href="#gentle-wave" x="48" y="5" fill="rgba(255, 255, 255, 0.1)" />
+                <use xlink:href="#gentle-wave" x="48" y="7" fill="#ffffff" />
+            </g>
+        </svg>
+
+        <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="max-w-2xl text-white space-y-6">
+                <div class="inline-block border border-blue-400/30 bg-blue-500/10 text-blue-300 text-xs font-bold px-3 py-1 rounded-sm uppercase tracking-widest mb-2">
+                    Desde 2002
                 </div>
-                
-                <h1 class="text-5xl md:text-6xl lg:text-7xl font-serif font-bold leading-tight drop-shadow-lg">
-                    A Frescura do Mar <br/>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-200 to-blue-400">à Sua Mesa.</span>
-                </h1>
-                
-                <p class="text-lg md:text-xl text-gray-200 max-w-xl leading-relaxed font-light">
-                    Importação, exportação e distribuição de congelados com qualidade premium. Confiança que vem do mar desde 2002.
+                <h2 class="text-4xl md:text-5xl lg:text-6xl font-serif font-bold leading-tight">
+                    Conectando Portugal ao<br>
+                    <span class="text-blue-400">melhor que o mar dá</span>
+                </h2>
+                <p class="text-lg text-slate-300 font-light leading-relaxed">
+                    Entregas rápidas e segurança alimentar rigorosa com soluções de preço competitivas, adaptadas às necessidades reais do seu negócio.
                 </p>
-
-                <div class="flex flex-col sm:flex-row gap-4 pt-4">
-                    <a href="#catalog" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg hover:shadow-blue-500/40 flex items-center justify-center gap-2 group transform hover:-translate-y-1">
+                <div class="pt-6 flex flex-col sm:flex-row gap-4">
+                    <a href="#catalog" class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-md font-bold text-center transition-colors shadow-lg flex justify-center items-center gap-2">
                         Ver Catálogo
-                        <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                        <span class="material-symbols-outlined text-[20px]">arrow_forward</span>
                     </a>
-                    <a href="#about" class="glass-panel-dark hover:bg-white/10 text-white px-8 py-4 rounded-xl font-bold transition-all flex items-center justify-center gap-2 backdrop-blur-md border border-white/20 hover:border-white/40">
-                        <span class="material-symbols-outlined">history_edu</span>
-                        Nossa História
+                    <a href="#about" class="bg-white/10 hover:bg-white/20 text-white border border-white/20 px-8 py-4 rounded-md font-bold text-center transition-colors flex justify-center items-center gap-2">
+                        A Nossa História
                     </a>
                 </div>
             </div>
-            
-            <!-- Elementos decorativos (cartões) removidos para limpar a imagem de fundo -->
-        </div>
-
-        <!-- Scroll Indicator -->
-        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/70 animate-bounce-slow hidden md:flex flex-col items-center">
-            <span class="text-[10px] uppercase tracking-widest font-bold mb-2">Scroll</span>
-            <span class="material-symbols-outlined">keyboard_arrow_down</span>
         </div>
     </section>
 
     <!-- Sobre Nós -->
-    <section id="about" class="py-24 px-4 bg-white relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-1/3 h-full bg-blue-50/50 skew-x-12 translate-x-20 pointer-events-none"></div>
-        <div class="container mx-auto max-w-7xl relative z-10">
-            <div class="flex flex-col md:flex-row items-center gap-16">
-                <div class="w-full md:w-1/2 relative group">
-                    <div class="absolute inset-0 bg-primary rounded-full blur-3xl opacity-20 transform translate-x-10 translate-y-10 group-hover:opacity-30 transition-opacity duration-500"></div>
-                    <img src="https://i.postimg.cc/hvLM4TvL/IMG-E7740.jpg" alt="JFC Seafood História" class="relative rounded-3xl shadow-2xl border-4 border-white w-full max-w-md mx-auto object-cover aspect-square transform group-hover:scale-[1.02] transition-transform duration-500">
-                    <!-- Badge de Experiência -->
-                    <div class="absolute -bottom-6 -right-6 md:right-10 bg-white p-4 rounded-xl shadow-xl border border-slate-100 flex items-center gap-3 animate-fade-in-up">
-                        <span class="text-3xl font-black text-primary">20+</span>
-                        <div class="text-xs font-bold text-slate-500 uppercase leading-tight">Anos de<br>Excelência</div>
-                    </div>
+    <section id="about" class="py-24 bg-white border-b border-slate-100">
+        <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+                
+                <!-- Imagem (Fixa ao fazer scroll) com Efeitos -->
+                <div class="relative w-full max-w-md mx-auto lg:mx-0 mb-8 lg:mb-0 lg:sticky lg:top-28 group">
+                    <div class="absolute top-4 -left-4 w-full h-full bg-slate-100 rounded-lg -z-10 group-hover:top-6 group-hover:-left-6 group-hover:bg-blue-50/50 transition-all duration-500"></div>
+                    <img src="https://i.postimg.cc/hvLM4TvL/IMG-E7740.jpg" alt="JFC Seafood Instalações" class="rounded-lg shadow-md border border-slate-200 w-full object-contain bg-white p-8 aspect-[4/3] group-hover:shadow-2xl transition-all duration-500 relative z-10">
                 </div>
                 
-                <div class="w-full md:w-1/2 space-y-8">
+                <!-- Texto e Novos Elementos -->
+                <div class="space-y-8">
                     <div>
-                        <h2 class="text-sm font-bold text-primary uppercase tracking-widest mb-2 flex items-center gap-2">
-                            <span class="w-8 h-[2px] bg-primary"></span> Sobre a Empresa
+                        <h3 class="text-primary font-bold uppercase tracking-widest text-sm mb-2 flex items-center gap-2">
+                            <span class="w-8 h-px bg-primary"></span> Sobre a Empresa
+                        </h3>
+                        <h2 class="text-3xl md:text-4xl font-serif font-bold text-slate-900">
+                            Paixão pelo mar, compromisso absoluto com a qualidade.
                         </h2>
-                        <h3 class="text-4xl md:text-5xl font-serif font-bold text-slate-900 leading-tight">Paixão pelo mar, compromisso com a qualidade.</h3>
                     </div>
                     
-                    <div class="text-slate-600 leading-relaxed text-lg space-y-4">
+                    <div class="text-slate-600 text-lg leading-relaxed space-y-4">
                         <p>
-                            Especialista na importação, exportação e distribuição de produtos alimentares congelados, a <strong class="text-primary">JFC Seafood</strong> opera desde 2002 a partir da região de Lisboa.
+                            Especialista na importação, exportação e distribuição de produtos alimentares congelados, a <strong class="text-primary font-semibold">JFC Seafood</strong> opera ativamente desde 2002 a partir da região de Lisboa.
                         </p>
                         <p>
-                            O nosso crescimento contínuo é o resultado da nossa profunda dedicação à excelência e da sólida relação de confiança que construímos com os nossos clientes.
+                            O nosso crescimento contínuo é o resultado da nossa profunda dedicação à excelência e da sólida relação de confiança que construímos com parceiros e clientes.
                         </p>
                     </div>
 
-                    <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                        <h4 class="font-bold text-slate-800 mb-4">Os nossos pilares fundamentais:</h4>
-                        <ul class="space-y-3">
-                            <li class="flex items-center gap-3 text-slate-700 font-medium">
-                                <span class="material-symbols-outlined text-green-500 filled">check_circle</span>
-                                Qualidade superior dos produtos
-                            </li>
-                            <li class="flex items-center gap-3 text-slate-700 font-medium">
-                                <span class="material-symbols-outlined text-green-500 filled">check_circle</span>
-                                Melhor relação preço-qualidade
-                            </li>
-                            <li class="flex items-center gap-3 text-slate-700 font-medium">
-                                <span class="material-symbols-outlined text-green-500 filled">check_circle</span>
-                                Entregas rápidas e eficientes
-                            </li>
-                        </ul>
+                    <!-- Novos Cards Estatísticas -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="group bg-slate-50 border border-slate-100 rounded-xl p-5 flex flex-col justify-center hover:bg-blue-50/50 hover:border-blue-200 hover:-translate-y-1 hover:shadow-md transition-all duration-300 cursor-default">
+                            <span class="material-symbols-outlined text-primary mb-2 text-3xl group-hover:scale-125 group-hover:-rotate-12 transition-transform duration-300">group</span>
+                            <span class="text-3xl font-black text-slate-800">850+</span>
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Clientes</span>
+                        </div>
+                        <div class="group bg-slate-50 border border-slate-100 rounded-xl p-5 flex flex-col justify-center hover:bg-blue-50/50 hover:border-blue-200 hover:-translate-y-1 hover:shadow-md transition-all duration-300 cursor-default">
+                            <span class="material-symbols-outlined text-primary mb-2 text-3xl group-hover:scale-125 group-hover:rotate-12 transition-transform duration-300">trending_up</span>
+                            <span class="text-3xl font-black text-slate-800">20+</span>
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Anos de Experiência</span>
+                        </div>
+                    </div>
+
+                    <!-- Pilares Fundamentais em Lista -->
+                    <div class="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm hover:shadow-lg transition-shadow duration-500">
+                        <h4 class="font-bold text-slate-800 mb-6 flex items-center gap-2 text-lg">
+                            <span class="material-symbols-outlined text-primary">verified</span>
+                            Pilares Fundamentais
+                        </h4>
+                        <div class="space-y-6">
+                            <!-- Pilar 1 -->
+                            <div class="flex gap-4 group cursor-default hover:translate-x-2 transition-transform duration-300">
+                                <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0 text-primary group-hover:bg-primary group-hover:text-white group-hover:shadow-md transition-all duration-300">
+                                    <span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">workspace_premium</span>
+                                </div>
+                                <div>
+                                    <h5 class="font-bold text-slate-800 group-hover:text-primary transition-colors">Qualidade Consistente</h5>
+                                    <p class="text-sm text-slate-600 mt-1">Trabalhamos com padrões rigorosos de segurança em todas as nossas linhas. Asseguramos que cada produto, independentemente do seu escalão de preço, cumpre as normas exigidas e as necessidades reais do seu negócio.</p>
+                                </div>
+                            </div>
+                            <!-- Pilar 2 -->
+                            <div class="flex gap-4 group cursor-default hover:translate-x-2 transition-transform duration-300">
+                                <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0 text-primary group-hover:bg-primary group-hover:text-white group-hover:shadow-md transition-all duration-300">
+                                    <span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">price_check</span>
+                                </div>
+                                <div>
+                                    <h5 class="font-bold text-slate-800 group-hover:text-primary transition-colors">Competitividade e Valor</h5>
+                                    <p class="text-sm text-slate-600 mt-1">Otimizamos a nossa rede de abastecimento e logística para garantir preços competitivos. Através de parcerias sólidas e volume de escala, oferecemos uma solução rentável que equilibra custo e segurança alimentar.</p>
+                                </div>
+                            </div>
+                            <!-- Pilar 3 -->
+                            <div class="flex gap-4 group cursor-default hover:translate-x-2 transition-transform duration-300">
+                                <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center shrink-0 text-primary group-hover:bg-primary group-hover:text-white group-hover:shadow-md transition-all duration-300">
+                                    <span class="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">local_shipping</span>
+                                </div>
+                                <div>
+                                    <h5 class="font-bold text-slate-800 group-hover:text-primary transition-colors">Entregas Rápidas e Eficientes</h5>
+                                    <p class="text-sm text-slate-600 mt-1">Frota própria e armazéns monitorizados garantem logística rápida e controlada termicamente.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cobertura em Portugal -->
+            <div class="mt-12 bg-white border border-slate-200 rounded-3xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-8 shadow-sm hover:shadow-lg hover:border-blue-200 hover:-translate-y-1 transition-all duration-500 group">
+                <div class="max-w-xl">
+                    <h4 class="font-bold text-slate-800 text-xl mb-2 group-hover:text-primary transition-colors">Cobertura em Portugal</h4>
+                    <p class="text-slate-600">De Setúbal a Aveiro, com especial foco na Grande Lisboa. A nossa frota própria assegura entregas rápidas.</p>
+                    <div class="mt-4 p-3 bg-blue-50/50 border border-blue-100 rounded-lg flex items-start sm:items-center gap-2 text-sm text-slate-600 hover:bg-blue-50 hover:border-blue-300 hover:shadow-sm transition-all duration-300 cursor-default">
+                        <span class="material-symbols-outlined text-[20px] text-primary shrink-0 animate-pulse">info</span>
+                        <span>* Para grandes volumes, asseguramos logística em todo o território nacional. <a href="#contact" class="text-primary font-bold hover:underline transition-colors">Consulte-nos.</a></span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-8 shrink-0">
+                    <div class="text-center md:text-right group-hover:scale-105 transition-transform duration-300">
+                        <p class="text-3xl font-black text-primary">300km</p>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Raio de Cobertura</p>
+                    </div>
+                    <div class="w-px h-12 bg-slate-200 hidden md:block"></div>
+                    <div class="text-center md:text-left group-hover:scale-105 transition-transform duration-300">
+                        <p class="text-3xl font-black text-green-500">48h</p>
+                        <p class="text-xs font-bold text-slate-500 uppercase tracking-widest mt-1">Máx. Entrega</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Compromisso / Qualidade -->
-    <section id="quality" class="py-24 px-4 bg-slate-50">
-        <div class="container mx-auto max-w-7xl">
-            <div class="text-center max-w-3xl mx-auto mb-16">
-                <h2 class="text-4xl font-black text-primary mb-4">O Nosso Compromisso</h2>
-                <p class="text-slate-500 text-lg">Garantimos a excelência em cada etapa do processo, desde a origem sustentável até à entrega certificada.</p>
+    <!-- Qualidade / Compromisso -->
+    <section id="quality" class="py-24 bg-slate-50 border-b border-slate-200 overflow-hidden">
+        <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                <h2 class="text-3xl md:text-4xl font-serif font-bold text-slate-900">O Nosso Compromisso</h2>
+                <p class="text-slate-600 text-lg">Garantimos o rigor em cada etapa do processo, desde a origem até à sua porta.</p>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <!-- Card 1 -->
-                <div class="bg-white rounded-2xl p-8 shadow-xl shadow-slate-200/40 hover:-translate-y-2 transition-all duration-300 border border-slate-100 group">
-                    <div class="w-16 h-16 rounded-2xl bg-blue-50 text-primary flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-colors">
-                        <span class="material-symbols-outlined text-3xl">verified</span>
+                <div class="group bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:border-blue-200 hover:-translate-y-2 transition-all duration-300 cursor-default">
+                    <div class="w-14 h-14 rounded-full bg-blue-50 text-primary flex items-center justify-center mb-6 border border-blue-100 group-hover:bg-primary group-hover:text-white group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 shadow-sm">
+                        <span class="material-symbols-outlined text-2xl">workspace_premium</span>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-3">Certificações</h3>
-                    <p class="text-slate-600 text-sm leading-relaxed">
-                        Segurança alimentar como prioridade. Além do cumprimento rigoroso das normas HACCP, a JFC Seafood privilegia a seleção de fornecedores com certificação ISO 22000, reforçando o nosso compromisso com a qualidade e a total transparência em toda a cadeia de valor.
+                    <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-primary transition-colors duration-300">Certificações</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed group-hover:text-slate-700 transition-colors duration-300">
+                        Segurança alimentar como prioridade absoluta. Cumprimos as normas HACCP e privilegiamos o trabalho com fornecedores de certificação ISO 22000.
                     </p>
                 </div>
                 
                 <!-- Card 2 -->
-                <div class="bg-white rounded-2xl p-8 shadow-xl shadow-slate-200/40 hover:-translate-y-2 transition-all duration-300 border border-slate-100 group">
-                    <div class="w-16 h-16 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center mb-6 group-hover:bg-green-600 group-hover:text-white transition-colors">
-                        <span class="material-symbols-outlined text-3xl">sailing</span>
+                <div class="group bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:border-green-200 hover:-translate-y-2 transition-all duration-300 cursor-default">
+                    <div class="w-14 h-14 rounded-full bg-green-50 text-green-700 flex items-center justify-center mb-6 border border-green-100 group-hover:bg-green-600 group-hover:text-white group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-sm">
+                        <span class="material-symbols-outlined text-2xl">eco</span>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-3">Sustentabilidade</h3>
-                    <p class="text-slate-600 text-sm leading-relaxed">
-                        Prioridade total à saúde dos oceanos. A JFC Seafood privilegia a parceria com fornecedores que detêm os selos de sustentabilidade MSC e ASC, garantindo que a nossa gama de produtos provém de fontes responsáveis, que respeitam os ecossistemas marinhos e a biodiversidade.
+                    <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-green-700 transition-colors duration-300">Sustentabilidade</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed group-hover:text-slate-700 transition-colors duration-300">
+                        Priorizamos pescarias e fornecedores que detêm os selos de sustentabilidade MSC e ASC, garantindo produtos provenientes de fontes responsáveis.
                     </p>
                 </div>
 
                 <!-- Card 3 -->
-                <div class="bg-white rounded-2xl p-8 shadow-xl shadow-slate-200/40 hover:-translate-y-2 transition-all duration-300 border border-slate-100 group">
-                    <div class="w-16 h-16 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center mb-6 group-hover:bg-cyan-600 group-hover:text-white transition-colors">
-                        <span class="material-symbols-outlined text-3xl">ac_unit</span>
+                <div class="group bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:border-sky-200 hover:-translate-y-2 transition-all duration-300 cursor-default">
+                    <div class="w-14 h-14 rounded-full bg-sky-50 text-sky-700 flex items-center justify-center mb-6 border border-sky-100 group-hover:bg-sky-500 group-hover:text-white group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 shadow-sm">
+                        <span class="material-symbols-outlined text-2xl">severe_cold</span>
                     </div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-3">Logística de Frio</h3>
-                    <p class="text-slate-600 text-sm leading-relaxed">
-                        Onde a rapidez se une à segurança. Com frota própria e armazéns monitorizados, asseguramos entregas ágeis e total estabilidade térmica entre Setúbal e Aveiro, com especial foco na Grande Lisboa. Monitorizamos cada etapa do percurso para garantir o rigor absoluto da cadeia de frio, do primeiro quilómetro ao destino final.
+                    <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-sky-600 transition-colors duration-300">Logística de Frio</h3>
+                    <p class="text-slate-600 text-sm leading-relaxed group-hover:text-slate-700 transition-colors duration-300">
+                        Frota própria e armazéns monitorizados. Asseguramos entregas rápidas com estabilidade térmica total, operando intensivamente na Grande Lisboa, de Setúbal a Aveiro.
                     </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Logística e Distribuição -->
+    <section id="logistica" class="py-24 bg-white border-b border-slate-200 relative z-10">
+        <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            
+            <!-- Cabeçalho da Secção -->
+            <div class="text-center max-w-3xl mx-auto mb-16 space-y-4">
+                <span class="text-primary font-bold uppercase tracking-widest text-sm">Logística</span>
+                <h2 class="text-3xl md:text-4xl font-serif font-bold text-slate-900">
+                    Rede de Distribuição <span class="text-primary">Inteligente</span>
+                </h2>
+                <p class="text-slate-600 text-lg">A nossa logística integrada de cadeia de frio garante a integridade do produto da origem ao destino. Monitorização em tempo real e controlo de temperatura.</p>
+            </div>
+
+            <!-- Grid de Conteúdo -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <!-- Coluna Esquerda: Mapa -->
+                <div class="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm hover:shadow-lg transition-shadow duration-500">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary text-[20px] animate-bounce">location_on</span>
+                            Pontos de Origem Globais
+                        </h3>
+                        <span class="text-xs font-bold text-primary bg-blue-50 px-3 py-1 rounded-full border border-blue-100">23 Fontes</span>
+                    </div>
+
+                    <!-- Interface do Mapa -->
+                    <div class="relative w-full aspect-[4/3] flex items-center justify-center">
+                        
+                        <!-- Fundo Quadriculado (Grid) e Linhas -->
+                        <div class="absolute inset-0 bg-slate-50 rounded-2xl overflow-hidden border border-slate-100">
+                            <div class="absolute inset-0 opacity-40" style="background-image: linear-gradient(#cbd5e1 1px, transparent 1px), linear-gradient(90deg, #cbd5e1 1px, transparent 1px); background-size: 10% 10%;"></div>
+                            
+                            <!-- Linhas de Conexão (SVG) -->
+                            <svg class="absolute inset-0 w-full h-full pointer-events-none">
+                                <style>
+                                    line { 
+                                        stroke: #94a3b8; 
+                                        stroke-width: 1.5; 
+                                        stroke-dasharray: 4 6; 
+                                        animation: flowInward 30s linear infinite; 
+                                        opacity: 0.6;
+                                    }
+                                    @keyframes flowInward {
+                                        to { stroke-dashoffset: 200; } /* Faz a linha animar na direção do Hub */
+                                    }
+                                </style>
+                                <!-- Origens Anteriores -->
+                                <line x1="50%" y1="50%" x2="40%" y2="25%" /> <!-- IS -->
+                                <line x1="50%" y1="50%" x2="55%" y2="20%" /> <!-- NO -->
+                                <line x1="50%" y1="50%" x2="45%" y2="40%" /> <!-- ES -->
+                                <line x1="50%" y1="50%" x2="32%" y2="55%" /> <!-- BR -->
+                                <line x1="50%" y1="50%" x2="25%" y2="60%" /> <!-- PE -->
+                                <line x1="50%" y1="50%" x2="30%" y2="75%" /> <!-- AR -->
+                                <line x1="50%" y1="50%" x2="52%" y2="75%" /> <!-- ZA -->
+                                <line x1="50%" y1="50%" x2="62%" y2="65%" /> <!-- MZ -->
+                                <line x1="50%" y1="50%" x2="65%" y2="50%" /> <!-- KE -->
+                                <line x1="50%" y1="50%" x2="75%" y2="45%" /> <!-- IN -->
+                                <line x1="50%" y1="50%" x2="85%" y2="60%" /> <!-- ID -->
+                                
+                                <!-- Novas Origens -->
+                                <line x1="50%" y1="50%" x2="76%" y2="35%" /> <!-- CN -->
+                                <line x1="50%" y1="50%" x2="82%" y2="48%" /> <!-- VN -->
+                                <line x1="50%" y1="50%" x2="92%" y2="80%" /> <!-- NZ -->
+                                <line x1="50%" y1="50%" x2="20%" y2="55%" /> <!-- EC -->
+                                <line x1="50%" y1="50%" x2="44%" y2="62%" /> <!-- MA -->
+                                <line x1="50%" y1="50%" x2="47%" y2="68%" /> <!-- NA -->
+                                <line x1="50%" y1="50%" x2="20%" y2="30%" /> <!-- US -->
+                                <line x1="50%" y1="50%" x2="74%" y2="55%" /> <!-- TH -->
+                                <line x1="50%" y1="50%" x2="43%" y2="30%" /> <!-- IE -->
+                                <line x1="50%" y1="50%" x2="26%" y2="42%" /> <!-- CU -->
+                                <line x1="50%" y1="50%" x2="58%" y2="42%" /> <!-- TN -->
+                                <line x1="50%" y1="50%" x2="52%" y2="33%" /> <!-- DE -->
+                            </svg>
+                        </div>
+
+                        <!-- Nós (Pontos) Interativos -->
+                        
+                        <!-- Centro: Hub PT -->
+                        <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center z-20 group cursor-pointer hover:z-50">
+                            <!-- Animação de radar/pulso -->
+                            <div class="absolute inset-0 bg-primary rounded-full animate-ping opacity-30 scale-150 pointer-events-none"></div>
+                            
+                            <div class="relative w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-primary/40 ring-4 ring-white group-hover:scale-110 transition-transform duration-300">PT</div>
+                            <span class="text-[9px] font-bold text-primary mt-1 bg-white px-2 py-0.5 rounded shadow-sm group-hover:opacity-0 transition-opacity">Hub JFC</span>
+                            
+                            <div class="absolute top-full mt-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-white px-5 py-3 rounded-2xl shadow-2xl border border-slate-100 pointer-events-none w-max z-50">
+                                <p class="font-bold text-slate-900 text-sm">Portugal</p>
+                                <p class="text-primary text-xs font-medium">Sede e Centro Logístico</p>
+                            </div>
+                        </div>
+                        
+                        <!-- EUROPA & ÁFRICA DO NORTE -->
+                        <div class="absolute left-[40%] top-[25%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">IS</div>
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Islândia</p>
+                                <p class="text-blue-300 text-xs font-medium">Bacalhau</p>
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="absolute left-[55%] top-[20%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">NO</div>
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Noruega</p>
+                                <p class="text-blue-300 text-xs font-medium">Bacalhau</p>
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[45%] top-[40%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">ES</div>
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Espanha</p>
+                                <p class="text-blue-300 text-xs font-medium">Porco Preto e Legumes</p>
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[43%] top-[30%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">IE</div>
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Irlanda</p>
+                                <p class="text-blue-300 text-xs font-medium">Sapateiras</p>
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[52%] top-[33%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">DE</div>
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Alemanha</p>
+                                <p class="text-blue-300 text-xs font-medium">Patos</p>
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[44%] top-[62%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">MA</div>
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Marrocos</p>
+                                <p class="text-blue-300 text-xs font-medium">Polvo e Lulas</p>
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[58%] top-[42%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">TN</div>
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Tunísia</p>
+                                <p class="text-blue-300 text-xs font-medium">Carapau</p>
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <!-- AMÉRICAS -->
+                        <div class="absolute left-[20%] top-[30%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">US</div>
+                            <div class="absolute bottom-full mb-2 left-0 sm:left-1/2 sm:-translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Estados Unidos</p>
+                                <p class="text-blue-300 text-xs font-medium">Paloco</p>
+                                <div class="absolute top-full left-4 sm:left-1/2 sm:-translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[26%] top-[42%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">CU</div>
+                            <div class="absolute bottom-full mb-2 left-0 sm:left-1/2 sm:-translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Cuba</p>
+                                <p class="text-blue-300 text-xs font-medium">Lagosta</p>
+                                <div class="absolute top-full left-4 sm:left-1/2 sm:-translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[20%] top-[55%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">EC</div>
+                            <div class="absolute bottom-full mb-2 left-0 sm:left-1/2 sm:-translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Equador</p>
+                                <p class="text-blue-300 text-xs font-medium">Camarão sem Cabeça</p>
+                                <div class="absolute top-full left-4 sm:left-1/2 sm:-translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[25%] top-[65%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">PE</div>
+                            <div class="absolute bottom-full mb-2 left-0 sm:left-1/2 sm:-translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Peru</p>
+                                <p class="text-blue-300 text-xs font-medium">Pota</p>
+                                <div class="absolute top-full left-4 sm:left-1/2 sm:-translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[32%] top-[55%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">BR</div>
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Brasil</p>
+                                <p class="text-blue-300 text-xs font-medium">Carnes</p>
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[30%] top-[75%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">AR</div>
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Argentina</p>
+                                <p class="text-blue-300 text-xs font-medium">Pescada</p>
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <!-- ÁFRICA SUBSAARIANA -->
+                        <div class="absolute left-[47%] top-[68%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">NA</div>
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Namíbia</p>
+                                <p class="text-blue-300 text-xs font-medium">Tamboril e Pescada</p>
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[52%] top-[75%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">ZA</div>
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">África do Sul</p>
+                                <p class="text-blue-300 text-xs font-medium">Pescada</p>
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[62%] top-[65%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">MZ</div>
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Moçambique</p>
+                                <p class="text-blue-300 text-xs font-medium">Camarão e Polvo</p>
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[65%] top-[50%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">KE</div>
+                            <div class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Quénia</p>
+                                <p class="text-blue-300 text-xs font-medium">Polvo</p>
+                                <div class="absolute top-full left-1/2 -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <!-- ÁSIA & OCEANIA -->
+                        <div class="absolute left-[75%] top-[45%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">IN</div>
+                            <div class="absolute bottom-full mb-2 right-0 sm:left-1/2 sm:-translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Índia</p>
+                                <p class="text-blue-300 text-xs font-medium">Choco Limpo</p>
+                                <div class="absolute top-full right-4 sm:left-1/2 sm:-translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[76%] top-[35%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">CN</div>
+                            <div class="absolute bottom-full mb-2 right-0 sm:left-1/2 sm:-translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">China</p>
+                                <p class="text-blue-300 text-xs font-medium">Tamboril</p>
+                                <div class="absolute top-full right-4 sm:left-1/2 sm:-translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[74%] top-[55%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">TH</div>
+                            <div class="absolute bottom-full mb-2 right-0 sm:left-1/2 sm:-translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Tailândia</p>
+                                <p class="text-blue-300 text-xs font-medium">Camarão</p>
+                                <div class="absolute top-full right-4 sm:left-1/2 sm:-translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[82%] top-[48%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">VN</div>
+                            <div class="absolute bottom-full mb-2 right-0 sm:left-1/2 sm:-translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Vietname</p>
+                                <p class="text-blue-300 text-xs font-medium">Amêijoa</p>
+                                <div class="absolute top-full right-4 sm:left-1/2 sm:-translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[85%] top-[60%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">ID</div>
+                            <div class="absolute bottom-full mb-2 right-0 sm:left-1/2 sm:-translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Indonésia</p>
+                                <p class="text-blue-300 text-xs font-medium">Polvo</p>
+                                <div class="absolute top-full right-4 sm:left-1/2 sm:-translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute left-[92%] top-[80%] -translate-x-1/2 -translate-y-1/2 group cursor-pointer z-10 hover:z-50">
+                            <div class="w-6 h-6 bg-white border border-slate-200 rounded-full flex items-center justify-center text-slate-600 text-[9px] font-bold shadow-sm group-hover:border-primary group-hover:bg-primary group-hover:text-white group-hover:scale-125 group-hover:shadow-md transition-all duration-300">NZ</div>
+                            <div class="absolute bottom-full mb-2 right-0 opacity-0 group-hover:opacity-100 transition-all transform scale-95 group-hover:scale-100 bg-slate-900 text-white px-4 py-2.5 rounded-xl shadow-xl pointer-events-none w-max">
+                                <p class="font-bold text-sm">Nova Zelândia</p>
+                                <p class="text-blue-300 text-xs font-medium">Mexilhão Meia Casca</p>
+                                <div class="absolute top-full right-4 -mt-1 border-4 border-transparent border-t-slate-900"></div>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <!-- Legenda -->
+                    <div class="flex items-center gap-6 mt-6 text-xs text-slate-500">
+                        <div class="flex items-center gap-2 group cursor-default">
+                            <span class="w-3 h-3 bg-primary rounded-full group-hover:animate-ping"></span> Hub de Distribuição
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 bg-white border border-slate-300 rounded-full"></span> Ponto de Origem
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Coluna Direita: Métricas & Garantias -->
+                <div class="flex flex-col gap-8">
+                    
+                    <!-- Card de Desempenho -->
+                    <div class="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm hover:shadow-lg transition-shadow duration-500">
+                        <div class="flex items-center gap-2 mb-6">
+                            <span class="material-symbols-outlined text-primary">schedule</span>
+                            <h3 class="font-bold text-slate-800">Desempenho Logístico</h3>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <!-- Métrica 1 -->
+                            <div class="group bg-slate-50 p-5 rounded-2xl border border-slate-100 hover:bg-blue-50/50 hover:border-blue-200 hover:-translate-y-1 transition-all duration-300 cursor-default">
+                                <span class="material-symbols-outlined text-primary mb-2 text-[24px] group-hover:scale-125 group-hover:-rotate-12 transition-transform duration-300">device_thermostat</span>
+                                <p class="text-2xl font-black text-slate-900">-18ºC</p>
+                                <p class="text-xs font-bold text-slate-700 mt-1">Cadeia de Frio</p>
+                                <p class="text-[10px] text-slate-500 mt-0.5">Temperatura constante</p>
+                            </div>
+                            <!-- Métrica 2 -->
+                            <div class="group bg-slate-50 p-5 rounded-2xl border border-slate-100 hover:bg-green-50/50 hover:border-green-200 hover:-translate-y-1 transition-all duration-300 cursor-default">
+                                <span class="material-symbols-outlined text-green-500 mb-2 text-[24px] group-hover:scale-125 group-hover:translate-x-1 transition-transform duration-300">local_shipping</span>
+                                <p class="text-2xl font-black text-slate-900">48h</p>
+                                <p class="text-xs font-bold text-slate-700 mt-1">Entrega</p>
+                                <p class="text-[10px] text-slate-500 mt-0.5">Armazém ao destino</p>
+                            </div>
+                            <!-- Métrica 3 -->
+                            <div class="group bg-slate-50 p-5 rounded-2xl border border-slate-100 hover:bg-sky-50/50 hover:border-sky-200 hover:-translate-y-1 transition-all duration-300 cursor-default">
+                                <span class="material-symbols-outlined text-sky-500 mb-2 text-[24px] group-hover:scale-125 transition-transform duration-300">route</span>
+                                <p class="text-2xl font-black text-slate-900">300km</p>
+                                <p class="text-xs font-bold text-slate-700 mt-1">Cobertura</p>
+                                <p class="text-[10px] text-slate-500 mt-0.5">Raio Setúbal-Aveiro</p>
+                            </div>
+                            <!-- Métrica 4 -->
+                            <div class="group bg-slate-50 p-5 rounded-2xl border border-slate-100 hover:bg-indigo-50/50 hover:border-indigo-200 hover:-translate-y-1 transition-all duration-300 cursor-default">
+                                <span class="material-symbols-outlined text-indigo-500 mb-2 text-[24px] group-hover:scale-125 group-hover:rotate-12 transition-transform duration-300">verified_user</span>
+                                <p class="text-2xl font-black text-slate-900">100%</p>
+                                <p class="text-xs font-bold text-slate-700 mt-1">Rastreabilidade</p>
+                                <p class="text-[10px] text-slate-500 mt-0.5">Rastreamento total</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card de Garantias -->
+                    <div class="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm hover:shadow-lg transition-shadow duration-500">
+                        <h3 class="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-green-500">verified</span>
+                            Garantias da Cadeia de Frio
+                        </h3>
+                        <ul class="space-y-4">
+                            <li class="flex items-start gap-3 group cursor-default hover:translate-x-2 transition-transform duration-300">
+                                <span class="material-symbols-outlined text-green-500 shrink-0 group-hover:scale-125 transition-transform duration-300">check_circle</span>
+                                <span class="text-sm text-slate-600 font-medium mt-0.5 group-hover:text-slate-900 transition-colors">Frota própria com veículos de temperatura controlada</span>
+                            </li>
+                            <li class="flex items-start gap-3 group cursor-default hover:translate-x-2 transition-transform duration-300">
+                                <span class="material-symbols-outlined text-green-500 shrink-0 group-hover:scale-125 transition-transform duration-300">check_circle</span>
+                                <span class="text-sm text-slate-600 font-medium mt-0.5 group-hover:text-slate-900 transition-colors">Armazenamento em frio negativo com monitorização</span>
+                            </li>
+                            <li class="flex items-start gap-3 group cursor-default hover:translate-x-2 transition-transform duration-300">
+                                <span class="material-symbols-outlined text-green-500 shrink-0 group-hover:scale-125 transition-transform duration-300">check_circle</span>
+                                <span class="text-sm text-slate-600 font-medium mt-0.5 group-hover:text-slate-900 transition-colors">Monitorização de temperatura em tempo real</span>
+                            </li>
+                            <li class="flex items-start gap-3 group cursor-default hover:translate-x-2 transition-transform duration-300">
+                                <span class="material-symbols-outlined text-green-500 shrink-0 group-hover:scale-125 transition-transform duration-300">check_circle</span>
+                                <span class="text-sm text-slate-600 font-medium mt-0.5 group-hover:text-slate-900 transition-colors">Instalações de frio otimizadas para a preservação total da qualidade original</span>
+                            </li>
+                        </ul>
+                    </div>
+
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Catálogo de Produtos -->
-    <section id="catalog" class="py-24 px-4 bg-white">
-        <div class="container mx-auto max-w-7xl">
-            <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-                <div>
-                    <h2 class="text-4xl font-black text-primary">Catálogo de Produtos</h2>
-                    <p class="text-slate-500 mt-4 max-w-xl text-lg">Explore a nossa vasta gama de congelados selecionados. Clique numa categoria para ver os produtos específicos.</p>
-                    <p class="text-sm text-slate-400 mt-2 italic">* Nota: O catálogo online não apresenta a totalidade dos nossos artigos.</p>
+    <section id="catalog" class="py-24 bg-slate-50 relative z-10">
+        <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-slate-200 pb-6 gap-4">
+                <div class="max-w-3xl">
+                    <h2 class="text-3xl md:text-4xl font-serif font-bold text-slate-900 mb-4">Catálogo de Produtos</h2>
+                    <p class="text-slate-600 text-lg mb-4">Rigor térmico, entregas ágeis e preços competitivos: a combinação certa para a rentabilidade da sua operação.</p>
+                    <div class="inline-flex items-start gap-2 text-sm text-primary/90 font-medium bg-gradient-to-r from-blue-100/50 to-blue-50/30 p-3.5 rounded-lg border border-blue-200 shadow-[0_0_15px_rgba(59,130,246,0.05)] group hover:shadow-[0_0_20px_rgba(59,130,246,0.15)] hover:border-blue-300 hover:-translate-y-1 transition-all duration-300 cursor-default">
+                        <span class="material-symbols-outlined text-[20px] text-primary shrink-0 group-hover:animate-bounce">lightbulb</span>
+                        <span class="italic">* Nota: O nosso catálogo online não representa a totalidade dos artigos disponíveis. Contacte-nos para conhecer a nossa gama completa ou para pedidos específicos.</span>
+                    </div>
                 </div>
-                <div class="hidden md:block">
-                     <span class="text-sm font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                        Selecione uma categoria <span class="material-symbols-outlined">touch_app</span>
-                     </span>
+                <div class="text-sm font-semibold text-slate-500 uppercase tracking-widest bg-slate-50 px-4 py-2 rounded-md mb-2 md:mb-0">
+                    Selecione uma categoria
                 </div>
             </div>
 
             <!-- Grid de Categorias -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="catalog-grid">
-                <!-- Renderizado via JavaScript -->
+                <!-- Renderizado via JavaScript para facilitar manutenção -->
             </div>
         </div>
     </section>
 
     <!-- Setores -->
-    <section id="sectors" class="py-24 px-4 bg-slate-900 text-white relative overflow-hidden">
-        <!-- Fundo decorativo -->
-        <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(#4d6be6 1px, transparent 1px); background-size: 40px 40px;"></div>
-        
-        <div class="container mx-auto max-w-7xl relative z-10">
+    <section id="sectors" class="py-24 bg-primary text-white relative z-10 overflow-hidden">
+        <!-- Canvas para os Peixes Interativos (Sectores) -->
+        <canvas id="sectorsFishCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-0 mix-blend-screen opacity-50"></canvas>
+        <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
             <div class="text-center mb-16">
-                <h2 class="text-3xl md:text-4xl font-bold">Soluções por Setor</h2>
-                <p class="text-slate-400 mt-4 text-lg">Produtos adaptados às exigências específicas de cada cliente.</p>
+                <h2 class="text-3xl md:text-4xl font-serif font-bold mb-4">Soluções Adaptadas a Cada Setor</h2>
+                <p class="text-blue-200 text-lg max-w-2xl mx-auto">Fornecemos produtos que cumprem com as exigências técnicas e nutricionais de diversos mercados de atuação.</p>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Hospital -->
-                <div class="glass-panel-dark p-8 rounded-2xl hover:bg-white/5 transition-colors border-t-4 border-t-blue-500">
-                    <span class="material-symbols-outlined text-5xl text-blue-400 mb-6">local_hospital</span>
-                    <h3 class="text-2xl font-bold mb-3">Hospitais e Saúde</h3>
-                    <p class="text-slate-300 leading-relaxed">
-                        Garantimos a segurança alimentar sob as normas HACCP e um transporte seguro que preserva a integridade total dos produtos. A nossa vasta gama de soluções auferem as características ideais para as necessidades de hospitais e lares. Com rastreabilidade total e fichas técnicas detalhadas, apoiamos o vosso controlo com transparência e rigor.
-                    </p>
+                <!-- Setor 1 -->
+                <div class="group bg-primary-dark rounded-2xl p-8 border border-blue-800 shadow-inner hover:shadow-2xl hover:shadow-blue-900/60 hover:-translate-y-2 hover:border-blue-400 transition-all duration-300 cursor-default relative overflow-hidden">
+                    <!-- Efeito de Brilho Fundo -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="bg-blue-800 w-14 h-14 rounded-xl flex items-center justify-center mb-6 border border-blue-700 group-hover:bg-blue-500 group-hover:border-blue-400 group-hover:scale-110 group-hover:-rotate-6 transition-all duration-300 shadow-lg">
+                            <span class="material-symbols-outlined text-white text-2xl group-hover:animate-pulse">health_and_safety</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-white group-hover:text-blue-100 transition-colors duration-300">Hospitais e Lares</h3>
+                        <p class="text-blue-100/80 text-sm leading-relaxed group-hover:text-white transition-colors duration-300">
+                            Foco rigoroso em produtos seguros e nutritivos (ex: peixes sem espinhas). Acompanhamento de fichas técnicas para facilitar a criação de dietas hospitalares e geriátricas.
+                        </p>
+                    </div>
                 </div>
                 
-                <!-- Escolas -->
-                <div class="glass-panel-dark p-8 rounded-2xl hover:bg-white/5 transition-colors border-t-4 border-t-yellow-500">
-                    <span class="material-symbols-outlined text-5xl text-yellow-400 mb-6">school</span>
-                    <h3 class="text-2xl font-bold mb-3">Escolas e Cantinas</h3>
-                    <p class="text-slate-300 leading-relaxed">
-                        Asseguramos o rigor do sistema HACCP e um transporte seguro para que os produtos cheguem às cantinas com a máxima qualidade. A nossa gama de peixe e marisco auferem o equilíbrio nutricional necessário ao dia a dia escolar, mantendo uma rastreabilidade que garante total confiança em cada refeição servida aos alunos.
-                    </p>
+                <!-- Setor 2 -->
+                <div class="group bg-primary-dark rounded-2xl p-8 border border-blue-800 shadow-inner hover:shadow-2xl hover:shadow-blue-900/60 hover:-translate-y-2 hover:border-blue-400 transition-all duration-300 cursor-default relative overflow-hidden">
+                    <!-- Efeito de Brilho Fundo -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="bg-blue-800 w-14 h-14 rounded-xl flex items-center justify-center mb-6 border border-blue-700 group-hover:bg-blue-500 group-hover:border-blue-400 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
+                            <span class="material-symbols-outlined text-white text-2xl group-hover:animate-bounce">school</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-white group-hover:text-blue-100 transition-colors duration-300">Escolas e Cantinas</h3>
+                        <p class="text-blue-100/80 text-sm leading-relaxed group-hover:text-white transition-colors duration-300">
+                            Garantia de opções equilibradas e adequadas às normas das refeições escolares, suportando o desenvolvimento infantil com rastreabilidade total.
+                        </p>
+                    </div>
                 </div>
-
-                <!-- Restaurantes -->
-                <div class="glass-panel-dark p-8 rounded-2xl hover:bg-white/5 transition-colors border-t-4 border-t-green-500">
-                    <span class="material-symbols-outlined text-5xl text-green-400 mb-6">restaurant</span>
-                    <h3 class="text-2xl font-bold mb-3">Restauração</h3>
-                    <p class="text-slate-300 leading-relaxed">
-                        Pautamo-nos pelo rigor do sistema HACCP e por um transporte seguro e célere, garantindo que as propriedades originais do produto chegam à sua cozinha plenamente preservadas. As nossas soluções auferem a consistência e a excelência exigidas pelo ritmo da restauração. Reiteramos o compromisso de entregas rápidas e um serviço consistente, para que a sua operação nunca pare.
-                    </p>
+                
+                <!-- Setor 3 -->
+                <div class="group bg-primary-dark rounded-2xl p-8 border border-blue-800 shadow-inner hover:shadow-2xl hover:shadow-blue-900/60 hover:-translate-y-2 hover:border-blue-400 transition-all duration-300 cursor-default relative overflow-hidden">
+                    <!-- Efeito de Brilho Fundo -->
+                    <div class="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="bg-blue-800 w-14 h-14 rounded-xl flex items-center justify-center mb-6 border border-blue-700 group-hover:bg-blue-500 group-hover:border-blue-400 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 shadow-lg">
+                            <span class="material-symbols-outlined text-white text-2xl group-hover:scale-110 transition-transform duration-300">restaurant</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3 text-white group-hover:text-blue-100 transition-colors duration-300">Restaurantes e Hotelaria</h3>
+                        <p class="text-blue-100/80 text-sm leading-relaxed group-hover:text-white transition-colors duration-300">
+                            Consistência de calibre, gamas de alta qualidade (premium) para pratos exigentes e fiabilidade extrema nas entregas para que o seu serviço nunca falhe.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Contactos -->
-    <section id="contact" class="py-24 px-4 bg-slate-50">
-        <div class="container mx-auto max-w-6xl">
-            <div class="glass-panel rounded-3xl p-8 md:p-12 shadow-2xl border border-white overflow-hidden relative">
-                <!-- Decorative Circle -->
-                <div class="absolute -top-20 -right-20 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 relative z-10">
-                    <!-- Info -->
-                    <div class="space-y-8 flex flex-col justify-center">
+    <section id="contact" class="py-24 bg-slate-50 border-t border-slate-200 relative z-10">
+        <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2">
+                    <!-- Informação de Contacto -->
+                    <div class="p-10 lg:p-14 flex flex-col justify-center space-y-8">
                         <div>
-                            <h2 class="text-3xl font-black text-primary mb-2">Fale Connosco</h2>
-                            <p class="text-slate-500 text-lg">Estamos disponíveis para responder a todas as suas questões e apresentar orçamentos personalizados.</p>
+                            <h2 class="text-3xl font-serif font-bold text-slate-900 mb-4">Fale Connosco</h2>
+                            <p class="text-slate-600 text-lg">A nossa equipa comercial está pronta para responder a questões e apresentar soluções comerciais adequadas.</p>
                         </div>
-
                         <div class="space-y-6">
-                            <div class="flex items-start gap-4 p-4 rounded-xl hover:bg-white/50 transition-colors">
-                                <div class="bg-white p-3 rounded-xl shadow-sm text-primary shrink-0">
+                            <div class="flex items-start gap-4">
+                                <div class="bg-slate-50 p-3 rounded-md border border-slate-100 text-primary">
                                     <span class="material-symbols-outlined">location_on</span>
                                 </div>
                                 <div>
-                                    <h4 class="font-bold text-slate-800">Morada</h4>
-                                    <p class="text-slate-600 text-sm">Rua 25 de Abril, nº 139<br/>2670-764 Tocadelos/Lousa, Portugal</p>
+                                    <h4 class="font-bold text-slate-900">Armazém e Sede</h4>
+                                    <p class="text-slate-600 mt-1">Rua 25 de Abril, nº 139<br/>2670-764 Tocadelos, Lousa - Portugal</p>
                                 </div>
                             </div>
-
-                            <div class="flex items-start gap-4 p-4 rounded-xl hover:bg-white/50 transition-colors">
-                                <div class="bg-white p-3 rounded-xl shadow-sm text-primary shrink-0">
-                                    <span class="material-symbols-outlined">call</span>
+                            <div class="flex items-start gap-4">
+                                <div class="bg-slate-50 p-3 rounded-md border border-slate-100 text-primary">
+                                    <span class="material-symbols-outlined">phone_in_talk</span>
                                 </div>
                                 <div>
-                                    <h4 class="font-bold text-slate-800">Telefone</h4>
-                                    <p class="text-slate-600 text-sm font-semibold">(+351) 934 872 422</p>
+                                    <h4 class="font-bold text-slate-900">Telefone Direto</h4>
+                                    <p class="text-slate-600 mt-1 font-semibold text-lg">(+351) 934 872 422</p>
                                 </div>
                             </div>
-
-                            <div class="flex items-start gap-4 p-4 rounded-xl hover:bg-white/50 transition-colors">
-                                <div class="bg-white p-3 rounded-xl shadow-sm text-primary shrink-0">
+                            <div class="flex items-start gap-4">
+                                <div class="bg-slate-50 p-3 rounded-md border border-slate-100 text-primary">
                                     <span class="material-symbols-outlined">mail</span>
                                 </div>
                                 <div>
-                                    <h4 class="font-bold text-slate-800">Email</h4>
-                                    <p class="text-slate-600 text-sm">geral@jfcseafood.com</p>
+                                    <h4 class="font-bold text-slate-900">E-mail Comercial</h4>
+                                    <p class="text-slate-600 mt-1">geral@jfcseafood.com</p>
                                 </div>
                             </div>
                         </div>
-
-                        <div class="flex gap-4 pt-4 px-4">
-                            <a href="https://www.facebook.com/people/JFC-Seafood/61560042352731/" target="_blank" class="w-12 h-12 flex items-center justify-center rounded-full bg-blue-100 text-blue-800 hover:bg-blue-600 hover:text-white transition-all transform hover:-translate-y-1 group" aria-label="Facebook">
-                                <svg class="w-6 h-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        <!-- Redes Sociais -->
+                        <div class="pt-6 border-t border-slate-100 flex gap-4">
+                            <a href="https://www.facebook.com/people/JFC-Seafood/61560042352731/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded bg-slate-100 text-slate-500 hover:bg-blue-600 hover:text-white transition-colors" aria-label="Facebook">
+                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                             </a>
-                            <a href="https://www.instagram.com/jfc.seafood/" target="_blank" class="w-12 h-12 flex items-center justify-center rounded-full bg-pink-100 text-pink-700 hover:bg-pink-600 hover:text-white transition-all transform hover:-translate-y-1 group" aria-label="Instagram">
-                                <svg class="w-6 h-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                            <a href="https://www.instagram.com/jfc.seafood/" target="_blank" class="w-10 h-10 flex items-center justify-center rounded bg-slate-100 text-slate-500 hover:bg-pink-600 hover:text-white transition-colors" aria-label="Instagram">
+                                <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                             </a>
                         </div>
                     </div>
-
-                    <!-- Mapa -->
-                    <div class="h-[300px] lg:h-full rounded-2xl overflow-hidden shadow-inner bg-slate-200 border-4 border-white">
+                    <!-- Mapa Google Maps -->
+                    <div class="h-[400px] lg:h-auto w-full bg-slate-200">
                         <iframe 
                             src="https://maps.google.com/maps?q=JFC+Seafood,+Rua+25+de+Abril+139,+Lousa&t=&z=15&ie=UTF8&iwloc=&output=embed" 
                             width="100%" 
@@ -431,7 +889,8 @@
                             style="border:0;" 
                             allowfullscreen="" 
                             loading="lazy" 
-                            referrerpolicy="no-referrer-when-downgrade">
+                            referrerpolicy="no-referrer-when-downgrade"
+                            title="Localização da JFC Seafood">
                         </iframe>
                     </div>
                 </div>
@@ -440,293 +899,207 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-white py-12 border-t border-slate-100">
-        <div class="container mx-auto px-4 text-center">
-            <div class="flex justify-center mb-6">
-                 <img src="https://i.postimg.cc/hvLM4TvL/IMG-E7740.jpg" alt="Logo" class="h-16 w-16 rounded-full object-cover grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-500">
+    <footer id="footer" class="bg-slate-900 text-slate-400 py-12 mt-auto border-t border-slate-800 relative z-10 overflow-hidden">
+        <!-- Canvas para os Peixes Interativos (Footer) -->
+        <canvas id="footerFishCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-0 mix-blend-screen opacity-10"></canvas>
+        <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col items-center text-center relative z-10">
+            <div class="mb-8 flex flex-col items-center">
+                <img src="https://i.postimg.cc/hvLM4TvL/IMG-E7740.jpg" alt="Logo" class="h-12 w-12 rounded-full object-cover grayscale opacity-60 hover:grayscale-0 hover:opacity-100 transition-all duration-300 mb-5">
+                <p class="max-w-md text-slate-400 text-sm leading-relaxed mb-4">
+                    Importação, exportação e distribuição de congelados com qualidade premium desde 2002.
+                </p>
+                <div class="flex items-center gap-2 text-xs font-medium text-slate-400 bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></span>
+                    Sistemas Operacionais
+                </div>
             </div>
-            <div class="flex justify-center gap-6 mb-8 text-sm text-slate-500">
-                <a href="#about" class="hover:text-primary transition-colors">Sobre Nós</a>
-                <a href="#catalog" class="hover:text-primary transition-colors">Produtos</a>
-                <a href="#contact" class="hover:text-primary transition-colors">Contactos</a>
+            <div class="flex flex-wrap justify-center gap-6 mb-8 text-sm text-slate-300 font-medium">
+                <a href="#about" class="hover:text-white transition-colors">Sobre Nós</a>
+                <a href="#logistica" class="hover:text-white transition-colors">Logística</a>
+                <a href="#catalog" class="hover:text-white transition-colors">Produtos</a>
+                <a href="#sectors" class="hover:text-white transition-colors">Setores</a>
+                <a href="#contact" class="hover:text-white transition-colors">Contactos</a>
             </div>
-            <p class="text-slate-400 text-sm">
-                © <script>document.write(new Date().getFullYear())</script> JFC Seafood. Todos os direitos reservados.
-            </p>
-            <p class="text-slate-300 text-xs mt-2">
-                Desenvolvido para os amantes do mar.
+            <p class="text-sm">
+                &copy; <script>document.write(new Date().getFullYear())</script> JFC Seafood. Todos os direitos reservados.
             </p>
         </div>
     </footer>
 
-    <!-- MODAL COMPONENT (Hidden by default) -->
-    <div id="product-modal" class="fixed inset-0 z-[100] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <!-- Backdrop com blur -->
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity opacity-0" id="modal-backdrop"></div>
+    <!-- ==================== MODAL DE PRODUTOS ==================== -->
+    <div id="product-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 sm:p-6" aria-modal="true" role="dialog">
+        <!-- Fundo Escurecido (Overlay) -->
+        <div id="modal-backdrop" class="absolute inset-0 bg-slate-900/70 modal-overlay opacity-0 cursor-pointer" onclick="closeModal()"></div>
 
-        <!-- Panel -->
-        <div class="fixed inset-0 z-10 overflow-y-auto">
-            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-                <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-4xl opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95 border border-white/20" id="modal-panel">
-                    
-                    <!-- Header -->
-                    <div class="bg-slate-50 px-6 py-4 border-b border-slate-100 flex justify-between items-center sticky top-0 z-10">
-                        <div>
-                             <h3 class="text-2xl font-black text-primary" id="modal-title">Categoria</h3>
-                             <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">Catálogo Digital</p>
-                        </div>
-                        <button type="button" class="rounded-full p-2 bg-white text-slate-400 hover:text-red-500 hover:bg-red-50 transition-colors focus:outline-none shadow-sm border border-slate-100" onclick="closeModal()">
-                            <span class="material-symbols-outlined">close</span>
-                        </button>
-                    </div>
-
-                    <!-- Body -->
-                    <div class="px-6 py-6 max-h-[70vh] overflow-y-auto custom-scrollbar bg-slate-50/50">
-                        <div class="bg-blue-50/50 p-5 rounded-xl border border-blue-100 mb-8 flex gap-4 items-start">
-                             <span class="material-symbols-outlined text-blue-400 mt-1">info</span>
-                             <p class="text-slate-600 italic" id="modal-desc">Descrição...</p>
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="modal-products">
-                            <!-- Produtos injetados aqui via JS -->
-                        </div>
-                    </div>
-
-                    <!-- Footer -->
-                    <div class="bg-white px-6 py-4 sm:flex sm:flex-row-reverse border-t border-slate-100 gap-3">
-                        <a href="#contact" onclick="closeModal()" class="inline-flex w-full justify-center rounded-xl bg-primary px-5 py-3 text-sm font-bold text-white shadow-sm hover:bg-primary-dark sm:w-auto transition-colors items-center gap-2">
-                            <span class="material-symbols-outlined text-lg">request_quote</span>
-                            Pedir Orçamento
-                        </a>
-                        <button type="button" class="mt-3 sm:mt-0 inline-flex w-full justify-center rounded-xl bg-white border border-slate-300 px-5 py-3 text-sm font-bold text-slate-700 shadow-sm hover:bg-slate-50 sm:w-auto transition-colors" onclick="closeModal()">
-                            Fechar
-                        </button>
-                    </div>
+        <!-- Painel do Modal -->
+        <div id="modal-panel" class="relative bg-white w-full max-w-4xl rounded-xl shadow-2xl flex flex-col max-h-[90vh] modal-content opacity-0 translate-y-4">
+            
+            <!-- Header do Modal -->
+            <div class="flex justify-between items-center px-6 py-5 border-b border-slate-200">
+                <div>
+                    <h3 class="text-2xl font-serif font-bold text-slate-900" id="modal-title">Categoria</h3>
+                    <p class="text-sm text-primary font-medium mt-1">Catálogo de Artigos</p>
                 </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 rounded p-2 transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+
+            <!-- Corpo do Modal (Scrollable) -->
+            <div class="overflow-y-auto px-6 py-6 custom-scrollbar bg-slate-50 flex-grow">
+                <p id="modal-desc" class="text-slate-600 mb-4 border-l-4 border-primary pl-4 bg-white p-3 shadow-sm rounded-r-md">Descrição da categoria.</p>
+                
+                <div class="flex items-start gap-2 text-xs text-primary/80 font-medium bg-blue-50/60 p-3 rounded-lg border border-blue-200 mb-8 group hover:bg-blue-100/60 hover:border-blue-400 hover:-translate-y-0.5 hover:shadow-sm transition-all duration-300 cursor-default">
+                    <span class="material-symbols-outlined text-[18px] text-primary shrink-0 group-hover:animate-pulse">info</span>
+                    <span class="italic">* Nota: O nosso catálogo online não representa a totalidade dos artigos disponíveis. Contacte-nos para conhecer a nossa gama completa ou para pedidos específicos.</span>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="modal-products">
+                    <!-- Cards de Produtos inseridos via JS -->
+                </div>
+            </div>
+
+            <!-- Footer do Modal -->
+            <div class="px-6 py-4 border-t border-slate-200 bg-white rounded-b-xl flex justify-end gap-4">
+                <button onclick="closeModal()" class="px-5 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-100 border border-slate-300 rounded-md transition-colors">
+                    Fechar
+                </button>
+                <a href="#contact" onclick="closeModal()" class="px-5 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-primary-dark rounded-md transition-colors flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[18px]">request_quote</span>
+                    Pedir Informações
+                </a>
             </div>
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- ==================== JAVASCRIPT ==================== -->
     <script>
-        // --- DADOS DO CATÁLOGO (Consolidados) ---
+        // --- DADOS DO CATÁLOGO CONSOLIDADOS ---
         const catalogData = [
             {
                 id: 'polvo',
                 title: 'Polvo',
-                description: 'Dispomos de uma vasta gama de polvo, selecionado na origem para garantir a máxima qualidade.',
-                image: 'https://i.postimg.cc/8c5QFKdG/Gemini-Generated-Image-y5qxg6y5qxg6y5qx.png',
+                description: 'Multiplicidade de calibres e origens para responder a todas as exigências da sua operação. Seleção técnica rigorosa que assegura a textura original e a máxima rentabilidade na cozinha.',
+                image: 'https://i.postimg.cc/G3xqv3cn/imagem-polvo.png',
                 products: [
-                    { title: "Polvo 500/1000 / Moçambique", code: "JFC-PLV-2001", saleUnit: "Caixas 6 quilos peso variável" },
-                    { title: "Polvo 1000/2000 / Indonésia", code: "JFC-PLV-2002", saleUnit: "Caixas 10 quilos" },
-                    { title: "Polvo 1500/2000 / Nacional – Quênia", code: "JFC-PLV-2003", saleUnit: "Caixas 15 quilos" },
-                    { title: "Polvo 2000/3000 / Nacional", code: "JFC-PLV-2004", saleUnit: "Caixas 10 quilos peso variável" }
+                    { title: "Polvo 500/1000 / Moçambique", code: "JFC-PLV-2001", saleUnit: "Caixas 6kg (peso variável)" },
+                    { title: "Polvo 1000/2000 / Indonésia", code: "JFC-PLV-2002", saleUnit: "Caixas 10kg" },
+                    { title: "Polvo 1500/2000 / Nac. Quênia", code: "JFC-PLV-2003", saleUnit: "Caixas 15kg" },
+                    { title: "Polvo 2000/3000 / Nacional", code: "JFC-PLV-2004", saleUnit: "Caixas 10kg (peso variável)" }
                 ]
             },
             {
                 id: 'bacalhau',
                 title: 'Bacalhau',
-                description: 'Explore a nossa ampla gama de bacalhau: das melhores origens do Atlântico e Pacífico, em cortes selecionados e processos que garantem o máximo sabor.',
-                image: 'https://i.postimg.cc/26y2hPtL/Gemini-Generated-Image-tafpy3tafpy3tafp.png',
+                description: 'As melhores origens da Noruega e Islândia em diversos cortes e calibres. Soluções ultracongeladas com monitorização térmica constante, assegurando a total segurança alimentar e o cumprimento dos mais rigorosos padrões do setor.',
+                image: 'https://i.postimg.cc/s2GTWp2n/Bacalhau-marmore-branco.png',
                 products: [
-                    { title: "Bacalhau Crescido Seco / Noruega", code: "JFC-BAC-3001", saleUnit: "Caixas de 25 kg" },
-                    { title: "Bacalhau Desfiado Demolhado / Pacífico", code: "JFC-BAC-3002", saleUnit: "Caixas de 6 kg (Granel)" },
-                    { title: "Bacalhau Desfiado Seco / Pacífico", code: "JFC-BAC-3003", saleUnit: "Caixas de 10 kg" },
-                    { title: "Bacalhau Lombo 200/300 / Islândia", code: "JFC-BAC-3004", saleUnit: "Caixas de 12 kg" },
-                    { title: "Bacalhau Lombo 250/300 / Noruega (GOLD)", code: "JFC-BAC-3005", saleUnit: "Caixas de 6 kg" },
-                    { title: "Bacalhau Lombo Centro 250/350 / Noruega (GOLD)", code: "JFC-BAC-3006", saleUnit: "Caixas de 6 kg" },
-                    { title: "Bacalhau Lombo Centro 200/300 / Noruega", code: "JFC-BAC-3007", saleUnit: "Caixas de 8 kg (Granel)" },
-                    { title: "Bacalhau Posta 300 Económica / Noruega", code: "JFC-BAC-3008", saleUnit: "Caixas de 6 kg (Granel)" },
-                    { title: "Bacalhau Posta 250/350 / Noruega", code: "JFC-BAC-3009", saleUnit: "Caixas de 8 kg (Granel)" },
-                    { title: "Bacalhau Posta 300/500 / Noruega", code: "JFC-BAC-3010", saleUnit: "Caixas de 8 kg (Granel)" },
-                    { title: "Bacalhau Posta c/ Lombo 200/400 / Noruega", code: "JFC-BAC-3011", saleUnit: "Caixas de 8 kg (Granel)" },
-                    { title: "Bacalhau Posta c/ Lombo 300/400 / Noruega", code: "JFC-BAC-3012", saleUnit: "Caixas de 8 kg (Granel)" },
-                    { title: "Bacalhau Posta Central 500/600 / Noruega (GOLD)", code: "JFC-BAC-3013", saleUnit: "Caixas de 10 kg" },
-                    { title: "Bacalhau Posta Longa 600/700 / Noruega (GOLD)", code: "JFC-BAC-3014", saleUnit: "Caixas de 10 kg" },
-                    { title: "Bacalhau Posta Média 400/500 / Noruega (GOLD)", code: "JFC-BAC-3015", saleUnit: "Caixas de 10 kg" },
-                    { title: "Caras Bacalhau / Islândia", code: "JFC-BAC-3016", saleUnit: "Caixas de 15 kg" },
-                    { title: "Lombinhos Bacalhau Sem Calibre / Noruega", code: "JFC-BAC-3017", saleUnit: "Caixas de 8 kg (Granel)" },
-                    { title: "Lombos Bacalhau 200/300 / Noruega", code: "JFC-BAC-3018", saleUnit: "Caixas de 8 kg (Granel)" },
-                    { title: "Lombos Bacalhau Médios 200/300 / Noruega", code: "JFC-BAC-3019", saleUnit: "Caixas de 8 kg (Granel)" }
+                    { title: "Bacalhau Crescido Seco", code: "JFC-BAC-3001", saleUnit: "Cx 25kg (Noruega)" },
+                    { title: "Bacalhau Desfiado Demolhado", code: "JFC-BAC-3002", saleUnit: "Cx 6kg Granel (Pacífico)" },
+                    { title: "Lombo Bacalhau 200/300", code: "JFC-BAC-3004", saleUnit: "Cx 12kg (Islândia)" },
+                    { title: "Lombo 250/300 GOLD", code: "JFC-BAC-3005", saleUnit: "Cx 6kg (Noruega)" },
+                    { title: "Lombo Centro 250/350 GOLD", code: "JFC-BAC-3006", saleUnit: "Cx 6kg (Noruega)" },
+                    { title: "Posta Central 500/600 GOLD", code: "JFC-BAC-3013", saleUnit: "Cx 10kg (Noruega)" },
+                    { title: "Posta Longa 600/700 GOLD", code: "JFC-BAC-3014", saleUnit: "Cx 10kg (Noruega)" },
+                    { title: "Caras de Bacalhau", code: "JFC-BAC-3016", saleUnit: "Cx 15kg (Islândia)" }
                 ]
             },
             {
                 id: 'marisco',
                 title: 'Marisco',
-                description: 'Gamas completas de camarão, bivalves e crustáceos, ultracongelados para máxima frescura.',
-                image: 'https://i.postimg.cc/mZdmZ2tJ/Gemini-Generated-Image-wwy0iwwy0iwwy0iw.png',
+                description: 'Gamas completas de camarão, bivalves e crustáceos com rigorosa seleção técnica. Garantimos a total integridade dos produtos e o melhor preço.',
+                image: 'https://i.postimg.cc/sfJC1R8t/camarao-tigre-no-marmore.png',
                 products: [
-                    { title: "Ameijoa com casca branca 60/80", code: "JFC-MAR-2001", saleUnit: "Caixas de 10 quilos (sacos de 1 kg)" },
-                    { title: "Ameijoa com casca castanha 60/80", code: "JFC-MAR-2002", saleUnit: "Caixas de 10 quilos (sacos de 1 kg)" },
-                    { title: "Miolo de ameijoa 700/1000", code: "JFC-MAR-2003", saleUnit: "Caixas de 10 quilos (sacos de 1 kg)" },
-                    { title: "Camarão com cabeça tigre 6/8", code: "JFC-MAR-2004", saleUnit: "Caixas de 10 quilos (embalagens de 1 kg)" },
-                    { title: "Camarão com cabeça 8/12", code: "JFC-MAR-2005", saleUnit: "Caixas de 10 quilos (embalagens de 1 kg)" },
-                    { title: "Camarão com cabeça 16/20", code: "JFC-MAR-2006", saleUnit: "Caixas de 10 quilos (embalagens de 1 kg)" },
-                    { title: "Camarão com cabeça 20/30 (cozido)", code: "JFC-MAR-2007", saleUnit: "Caixas de 12 quilos (embalagens de 2 kg)" },
-                    { title: "Camarão com cabeça 30/40", code: "JFC-MAR-2008", saleUnit: "Caixas de 12 quilos (embalagens de 2 kg)" },
-                    { title: "Camarão com cabeça 40/50", code: "JFC-MAR-2009", saleUnit: "Caixas de 12 quilos (embalagens de 2 kg)" },
-                    { title: "Camarão sem cabeça 26/30", code: "JFC-MAR-2010", saleUnit: "Caixas de 20 quilos (embalagens de 2 kg)" },
-                    { title: "Camarão sem cabeça 31/35", code: "JFC-MAR-2011", saleUnit: "Caixas de 20 quilos (embalagens de 2 kg)" },
-                    { title: "Camarão sem cabeça 41/50", code: "JFC-MAR-2012", saleUnit: "Caixas de 20 quilos (embalagens de 2 kg)" },
-                    { title: "Miolo de camarão 21/25 BT", code: "JFC-MAR-2013", saleUnit: "Caixas de 10 quilos (sacos de 1 kg)" },
-                    { title: "Miolo de camarão 30/40 (Vannamei)", code: "JFC-MAR-2014", saleUnit: "Caixas de 10 quilos (sacos de 1 kg)" },
-                    { title: "Miolo de camarão 31/40 com rabo", code: "JFC-MAR-2015", saleUnit: "Caixas de 10 quilos" },
-                    { title: "Mexilhão meia-casca 30/40", code: "JFC-MAR-2016", saleUnit: "Caixas de 12 unidades" },
-                    { title: "Miolo de mexilhão", code: "JFC-MAR-2017", saleUnit: "Caixas de 10 quilos (sacos de 1 kg)" },
-                    { title: "Miolo de vieira sem coral", code: "JFC-MAR-2018", saleUnit: "Caixas de 10 quilos (sacos de 1 kg)" },
-                    { title: "Lingueirão", code: "JFC-MAR-2019", saleUnit: "Caixas de 5 quilos (granel)" },
-                    { title: "Sapateira 800+", code: "JFC-MAR-2020", saleUnit: "Caixas de 10 quilos" },
-                    { title: "Recheio de sapateira", code: "JFC-MAR-2021", saleUnit: "Caixas de 10 quilos (embalagens de 500 g)" },
-                    { title: "Delícias do mar", code: "JFC-MAR-2022", saleUnit: "Caixas de 5 quilos (embalagens de 250 g)" }
+                    { title: "Amêijoa com Casca Branca", code: "JFC-MAR-2001", saleUnit: "Cx 10kg (Sacos 1kg)" },
+                    { title: "Miolo de Amêijoa 700/1000", code: "JFC-MAR-2003", saleUnit: "Cx 10kg (Sacos 1kg)" },
+                    { title: "Camarão Tigre 6/8", code: "JFC-MAR-2004", saleUnit: "Cx 10kg (Emb. 1kg)" },
+                    { title: "Camarão c/ Cabeça 20/30", code: "JFC-MAR-2007", saleUnit: "Cx 12kg (Emb. 2kg) - Cozido" },
+                    { title: "Camarão s/ Cabeça 26/30", code: "JFC-MAR-2010", saleUnit: "Cx 20kg (Emb. 2kg)" },
+                    { title: "Miolo Camarão 30/40", code: "JFC-MAR-2014", saleUnit: "Cx 10kg (Sacos 1kg)" },
+                    { title: "Sapateira 800+", code: "JFC-MAR-2020", saleUnit: "Cx 10kg" },
+                    { title: "Delícias do Mar", code: "JFC-MAR-2022", saleUnit: "Cx 5kg (Emb. 250g)" }
                 ]
             },
             {
                 id: 'pescado',
                 title: 'Pescado',
-                description: 'Filetes, lombos e postas das espécies mais procuradas, ideais para restauração e cantinas.',
-                image: 'https://i.postimg.cc/wjZ0dW4b/Gemini-Generated-Image-ig0xkoig0xkoig0x.png',
+                description: 'Filetes, lombos e postas das espécies mais procuradas, fáceis de preparar.',
+                image: 'https://i.postimg.cc/jjqZ8Gvn/File-de-peixe-fresco-em-marmore.png',
                 products: [
-                    { title: "Pescada 300/500 – Argentina", code: "JFC-PES-2001", saleUnit: "Caixas de 7 kg (granel)" },
-                    { title: "Pescada 900/1200 – África do Sul", code: "JFC-PES-2002", saleUnit: "Caixas de 12 kg (peso variável)" },
-                    { title: "Pescada 1600/2000 – África do Sul", code: "JFC-PES-2003", saleUnit: "Caixas de 12 kg (peso variável)" },
-                    { title: "Pescada Posta Cozer – África do Sul", code: "JFC-PES-2004", saleUnit: "Caixas de 7 kg (granel)" },
-                    { title: "Pescada Posta Fritar – África do Sul", code: "JFC-PES-2005", saleUnit: "Caixas de 7 kg (granel)" },
-                    { title: "Filetes de pescada sem pele – Argentina", code: "JFC-PES-2006", saleUnit: "Caixas de 7 kg (granel)" },
-                    { title: "Filetes de pescada sem pele 4/6 – África do Sul", code: "JFC-PES-2007", saleUnit: "Caixas de 10 kg (placas de 5 kg)" }
+                    { title: "Pescada Posta Cozer", code: "JFC-PES-2004", saleUnit: "Cx 7kg Granel (África Sul)" },
+                    { title: "Pescada Posta Fritar", code: "JFC-PES-2005", saleUnit: "Cx 7kg Granel (África Sul)" },
+                    { title: "Filetes Pescada s/ Pele", code: "JFC-PES-2006", saleUnit: "Cx 7kg Granel (Argentina)" }
                 ]
             },
             {
                 id: 'cefalopodes',
-                title: 'Cefalópodes',
-                description: 'Seleção de lulas, potas e chocos, disponíveis em argolas, inteiros ou limpos.',
-                image: 'https://i.postimg.cc/Z5dD0tdj/Gemini-Generated-Image-z80tlbz80tlbz80t.png',
+                title: 'Outros Cefalópodes',
+                description: 'Seleção de lulas, potas e chocos, disponíveis em vários cortes, ideais para fritos ou grelhados.',
+                image: 'https://i.postimg.cc/65LrDM8g/Lula-bebe-fresca-sobre-tabua-de-marmore.png',
                 products: [
-                    { title: "Choco limpo U/1 grande 1000/2000 – Índia", code: "JFC-CEF-4001", saleUnit: "Caixas de 10 kg (granel)" },
-                    { title: "Choco limpo 13/20 – Índia", code: "JFC-CEF-4002", saleUnit: "Caixas de 10 kg (sacos de 1 kg)" },
-                    { title: "Choco sujo 100/200 – Tailândia", code: "JFC-CEF-4003", saleUnit: "Caixas de 10 kg (placas de 5 kg)" },
-                    { title: "Choco sujo 200/300 – Tailândia", code: "JFC-CEF-4004", saleUnit: "Caixas de 10 kg (placas de 5 kg)" },
-                    { title: "Lula suja C4 solta – Maldivas", code: "JFC-CEF-4005", saleUnit: "Caixas de 5 kg" },
-                    { title: "Lula limpa 10/20 – Índia", code: "JFC-CEF-4006", saleUnit: "Caixas de 10 kg (sacos de 1 kg)" },
-                    { title: "Lula limpa U/10 – Índia", code: "JFC-CEF-4007", saleUnit: "Caixas de 10 kg (sacos de 1 kg)" },
-                    { title: "Lula limpa U/5 – Índia", code: "JFC-CEF-4008", saleUnit: "Caixas de 10 kg (sacos de 1 kg)" },
-                    { title: "Tubo de pota", code: "JFC-CEF-4009", saleUnit: "Caixas de 10 kg (sacos de 1 kg)" },
-                    { title: "Argolas de pota com ovo", code: "JFC-CEF-4010", saleUnit: "Caixas de 8 kg (sacos de 1 kg)" },
-                    { title: "Tiras de pota panadas", code: "JFC-CEF-4011", saleUnit: "Caixas de 5 kg (sacos de 0,5 kg)" }
+                    { title: "Choco Limpo U/1 (1000/2000)", code: "JFC-CEF-4001", saleUnit: "Cx 10kg Granel (Índia)" },
+                    { title: "Choco Sujo 100/200", code: "JFC-CEF-4003", saleUnit: "Cx 10kg (Placas 5kg)" },
+                    { title: "Lula Limpa U/10", code: "JFC-CEF-4007", saleUnit: "Cx 10kg (Sacos 1kg)" },
+                    { title: "Argolas de Pota", code: "JFC-CEF-4010", saleUnit: "Cx 8kg (Sacos 1kg)" }
                 ]
             },
             {
                 id: 'legumes',
                 title: 'Legumes',
-                description: 'Acompanhamento perfeito e prático. Ervilhas, feijão-verde e misturas.',
-                image: 'https://i.postimg.cc/J0gCVNfJ/Gemini-Generated-Image-24vna424vna424vn.png',
+                description: 'Acompanhamento perfeito e prático, prontos a cozinhar preservando o valor nutricional.',
+                image: 'https://i.postimg.cc/j5H2LF0H/Mistura-colorida-de-vegetais-frescos.png',
                 products: [
-                    { title: "Alho francês", code: "JFC-LEG-1001", saleUnit: "Caixas de 10 quilos (sacos de 2,5 kg)" },
-                    { title: "Brócolos", code: "JFC-LEG-1002", saleUnit: "Caixas de 10 quilos (sacos de 2,5 kg)" },
-                    { title: "Cenoura baby", code: "JFC-LEG-1003", saleUnit: "Caixas de 10 quilos (sacos de 2,5 kg)" },
-                    { title: "Cebola pérola", code: "JFC-LEG-1004", saleUnit: "Caixas de 10 quilos (sacos de 2,5 kg)" },
-                    { title: "Couve-flor", code: "JFC-LEG-1005", saleUnit: "Caixas de 10 quilos (sacos de 2,5 kg)" },
-                    { title: "Couve de Bruxelas", code: "JFC-LEG-1006", saleUnit: "Caixas de 10 quilos (sacos de 2,5 kg)" },
-                    { title: "Ervilha", code: "JFC-LEG-1007", saleUnit: "Caixas de 10 quilos (sacos de 2,5 kg)" },
-                    { title: "Feijão verde plano", code: "JFC-LEG-1008", saleUnit: "Caixas de 10 quilos (sacos de 2,5 kg)" },
-                    { title: "Grelos", code: "JFC-LEG-1009", saleUnit: "Caixas de 10 quilos (sacos de 1 kg)" },
-                    { title: "Espinafres em porções", code: "JFC-LEG-1010", saleUnit: "Caixas de 10 quilos (sacos de 2,5 kg)" },
-                    { title: "Espargos verdes", code: "JFC-LEG-1011", saleUnit: "Caixas de 5 quilos (sacos de 1 kg)" },
-                    { title: "Favas", code: "JFC-LEG-1012", saleUnit: "Caixas de 10 quilos (sacos de 2,5 kg)" },
-                    { title: "Milho doce", code: "JFC-LEG-1013", saleUnit: "Caixas de 10 quilos (sacos de 2,5 kg)" },
-                    { title: "Mistura chinesa", code: "JFC-LEG-1014", saleUnit: "Caixas de 10 quilos (sacos de 2,5 kg)" },
-                    { title: "Jardineira", code: "JFC-LEG-1015", saleUnit: "Caixas de 10 quilos (sacos de 2,5 kg)" },
-                    { title: "Macedónia de legumes", code: "JFC-LEG-1016", saleUnit: "Caixas de 10 quilos (sacos de 2,5 kg)" },
-                    { title: "Puré de batata", code: "JFC-LEG-1017", saleUnit: "Caixas de 10 quilos (sacos de 2,5 kg)" },
-                    { title: "Batata Lambweston cut 7/7 mm", code: "JFC-LEG-1018", saleUnit: "Caixas de 10 quilos (sacos de 2 kg)" },
-                    { title: "Batata palito 9/9 mm", code: "JFC-LEG-1019", saleUnit: "Caixas de 10 quilos (sacos de 2,5 kg)" },
-                    { title: "Castanha (nacional)", code: "JFC-LEG-1020", saleUnit: "Caixas de 5 quilos (sacos de 1 kg)" },
-                    { title: "Frutos silvestres", code: "JFC-LEG-1021", saleUnit: "Caixas de 5 quilos (sacos de 1 kg)" },
-                    { title: "Morangos", code: "JFC-LEG-1022", saleUnit: "Caixas de 5 quilos (sacos de 1 kg)" }
+                    { title: "Brócolos / Ervilhas", code: "JFC-LEG-BASE", saleUnit: "Cx 10kg (Sacos 2,5kg)" },
+                    { title: "Mistura Chinesa / Macedónia", code: "JFC-LEG-MIST", saleUnit: "Cx 10kg (Sacos 2,5kg)" },
+                    { title: "Batata Palito 9/9 mm", code: "JFC-LEG-1019", saleUnit: "Cx 10kg (Sacos 2,5kg)" },
+                    { title: "Frutos Silvestres / Morangos", code: "JFC-LEG-FRUT", saleUnit: "Cx 5kg (Sacos 1kg)" }
                 ]
             },
             {
                 id: 'carnes',
                 title: 'Carnes',
-                description: 'Seleção rigorosa de carnes de aves, porco e bovino.',
-                image: 'https://i.postimg.cc/h4sgsxhb/Gemini-Generated-Image-g0t8o1g0t8o1g0t8.png',
+                description: 'Cortes rigorosamente selecionados de carnes de aves, porco e bovino.',
+                image: 'https://i.postimg.cc/GmRCpmhR/vazia.png',
                 products: [
-                    { title: "Cotos de frango – Espanha", code: "JFC-CAR-1001", saleUnit: "Caixas de 10 quilos" },
-                    { title: "Moelas de frango – Brasil", code: "JFC-CAR-1002", saleUnit: "Caixas de 10 quilos (sacos de 1 kg)" },
-                    { title: "Peito de frango – Argentina", code: "JFC-CAR-1003", saleUnit: "Caixas de 12 quilos (sacos de 2 kg)" },
-                    { title: "Perna de frango – Espanha", code: "JFC-CAR-1004", saleUnit: "Caixas de 10 quilos" },
-                    { title: "Pato inteiro (2,8 kg)", code: "JFC-CAR-1005", saleUnit: "Caixas de 16,8 quilos" },
-                    { title: "Peito de pato", code: "JFC-CAR-1006", saleUnit: "Caixas de 10 quilos" },
-                    { title: "Perna de pato", code: "JFC-CAR-1007", saleUnit: "Caixas de 10 quilos" },
-                    { title: "Porco branco – Lagarto (Espanha)", code: "JFC-CAR-1008", saleUnit: "Caixas de 10 quilos (peso variável)" },
-                    { title: "Porco branco – Cachaço (Espanha)", code: "JFC-CAR-1009", saleUnit: "Caixas de 13,6 quilos" },
-                    { title: "Porco branco – Secretos (Espanha)", code: "JFC-CAR-1010", saleUnit: "Caixas de 10 quilos (peso variável)" },
-                    { title: "Pernil (metades)", code: "JFC-CAR-1011", saleUnit: "Consulta" },
-                    { title: "Plumas de vaca", code: "JFC-CAR-1012", saleUnit: "Caixas de 10 quilos" }
+                    { title: "Peito de Frango", code: "JFC-CAR-1003", saleUnit: "Cx 12kg (Sacos 2kg)" },
+                    { title: "Pato Inteiro / Peito / Perna", code: "JFC-CAR-PATO", saleUnit: "Cx 10kg a 16kg" },
+                    { title: "Porco Branco (Lagarto/Secretos)", code: "JFC-CAR-PORC", saleUnit: "Cx 10kg (peso variável)" },
+                    { title: "Plumas de Vaca", code: "JFC-CAR-1012", saleUnit: "Cx 10kg" }
                 ]
             },
             {
                 id: 'entradas',
-                title: 'Entradas',
-                description: 'Salgados e pré-cozinhados de excelência para começar a refeição da melhor forma.',
-                image: 'https://i.postimg.cc/CMzJrpx2/Gemini-Generated-Image-e0haufe0haufe0ha.png', 
+                title: 'Salgados e Sobremesas',
+                description: 'Pré-cozinhados de excelência e doces práticos para rentabilizar a sua operação.',
+                image: 'https://i.postimg.cc/4Nd4gddS/Pasteis-de-bacalhau-na-pedra-marmore.png', 
                 products: [
-                    { title: "Rissóis de camarão 42 g", code: "JFC-ENT-3001", saleUnit: "Caixas de 100 unidades" },
-                    { title: "Rissóis de camarão 70 g", code: "JFC-ENT-3002", saleUnit: "Caixas de 60 unidades" },
-                    { title: "Pastéis de bacalhau 30 g", code: "JFC-ENT-3003", saleUnit: "Caixas de 150 unidades" },
-                    { title: "Pastéis de bacalhau 60 g", code: "JFC-ENT-3004", saleUnit: "Caixas de 80 unidades" },
-                    { title: "Croquetes de carne 30 g", code: "JFC-ENT-3005", saleUnit: "Caixas de 150 unidades" },
-                    { title: "Croquetes de carne 60 g", code: "JFC-ENT-3006", saleUnit: "Caixas de 80 unidades" },
-                    { title: "Chamuças de frango 50 g", code: "JFC-ENT-3007", saleUnit: "Caixas de 60 unidades" },
-                    { title: "Panado de queijo e fiambre", code: "JFC-ENT-3008", saleUnit: "Caixas de 50 unidades" },
-                    { title: "Rissóis de camarão (forno)", code: "JFC-ENT-3009", saleUnit: "Caixas de 50 unidades" },
-                    { title: "Pastéis de bacalhau (forno)", code: "JFC-ENT-3010", saleUnit: "Caixas de 70 unidades" },
-                    { title: "Croquetes de carne (forno)", code: "JFC-ENT-3011", saleUnit: "Caixas de 70 unidades" }
-                ]
-            },
-            {
-                id: 'sobremesas',
-                title: 'Sobremesas',
-                description: 'Uma doce seleção de sobremesas prontas a servir para finalizar a refeição perfeita.',
-                image: 'https://i.postimg.cc/J7d4f0q9/Gemini-Generated-Image-bs468cbs468cbs46.png',
-                products: [
-                    { title: "Gelado Nata", code: "JFC-SOB-2001", saleUnit: "4.500ml" },
-                    { title: "Gelado Baunilha", code: "JFC-SOB-2002", saleUnit: "4.500ml" },
-                    { title: "Gelado Chocolate", code: "JFC-SOB-2003", saleUnit: "4.500ml" },
-                    { title: "Gelado Morangos", code: "JFC-SOB-2004", saleUnit: "4.500ml" },
-                    { title: "Sorvetes Limão", code: "JFC-SOB-2005", saleUnit: "4.500ml" },
-                    { title: "Sorvetes Manga", code: "JFC-SOB-2006", saleUnit: "4.500ml" },
-                    { title: "Sorvetes Tangerina", code: "JFC-SOB-2007", saleUnit: "4.500ml" },
-                    { title: "Profiteroles", code: "JFC-SOB-2008", saleUnit: "10 unidades" }
+                    { title: "Rissóis Camarão / Carne", code: "JFC-SALG-01", saleUnit: "Vários calibres e caixas" },
+                    { title: "Pastéis de Bacalhau", code: "JFC-SALG-02", saleUnit: "Vários calibres e caixas" },
+                    { title: "Gelados (Nata/Chocolate/Morangos)", code: "JFC-SOB-GEL", saleUnit: "Baldes 4.500ml" },
+                    { title: "Profiteroles", code: "JFC-SOB-2008", saleUnit: "Emb 10 unidades" }
                 ]
             }
         ];
 
-        // --- RENDERIZAR CATÁLOGO ---
+        // --- RENDERIZAR GRELHA DO CATÁLOGO ---
         const catalogGrid = document.getElementById('catalog-grid');
 
-        catalogData.forEach((category, index) => {
+        catalogData.forEach((category) => {
             const card = document.createElement('div');
-            // Animação de entrada stagger
-            card.style.animation = `fadeInUp 0.6s ease-out ${index * 0.1}s forwards`;
-            card.classList.add('opacity-0', 'transform', 'translate-y-8'); // Estado inicial
-            
-            card.className = "bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 group flex flex-col h-full border border-slate-100 hover:-translate-y-2";
+            card.className = "catalog-card bg-white rounded-lg overflow-hidden border border-slate-200 shadow-sm flex flex-col h-full cursor-pointer relative z-10";
+            card.onclick = () => openModal(category.id);
             
             card.innerHTML = `
-                <div class="h-56 overflow-hidden relative cursor-pointer" onclick="openModal('${category.id}')">
-                    <img src="${category.image}" alt="${category.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60"></div>
-                    <div class="absolute bottom-4 left-4 text-white">
-                         <span class="text-xs font-bold uppercase tracking-wider bg-primary/80 backdrop-blur-sm px-2 py-1 rounded mb-1 inline-block">Congelados</span>
-                    </div>
+                <div class="h-48 overflow-hidden relative">
+                    <img src="${category.image}" alt="${category.title}" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-slate-900/10"></div>
                 </div>
                 <div class="p-6 flex flex-col flex-grow">
-                    <h3 class="text-xl font-bold text-slate-800 mb-2 group-hover:text-primary transition-colors">${category.title}</h3>
-                    <p class="text-slate-500 text-sm mb-6 line-clamp-2 flex-grow">${category.description}</p>
-                    <button onclick="openModal('${category.id}')" class="w-full py-3 bg-slate-50 hover:bg-primary hover:text-white text-primary font-bold rounded-xl transition-all flex items-center justify-center gap-2 border border-primary/20 hover:border-transparent group-hover:shadow-lg hover:shadow-primary/30">
-                        Ver Produtos
-                        <span class="material-symbols-outlined text-sm">visibility</span>
-                    </button>
+                    <h3 class="text-xl font-bold text-slate-900 mb-2">${category.title}</h3>
+                    <p class="text-slate-600 text-sm mb-6 flex-grow">${category.description}</p>
+                    <div class="text-primary font-semibold text-sm flex items-center gap-1 mt-auto">
+                        Ver Produtos <span class="material-symbols-outlined text-[16px]">arrow_right_alt</span>
+                    </div>
                 </div>
             `;
             catalogGrid.appendChild(card);
@@ -736,97 +1109,222 @@
         const modal = document.getElementById('product-modal');
         const modalBackdrop = document.getElementById('modal-backdrop');
         const modalPanel = document.getElementById('modal-panel');
-        const modalTitle = document.getElementById('modal-title');
-        const modalDesc = document.getElementById('modal-desc');
-        const modalProducts = document.getElementById('modal-products');
-
+        
         function openModal(categoryId) {
             const category = catalogData.find(c => c.id === categoryId);
             if (!category) return;
 
-            // Preencher dados
-            modalTitle.textContent = category.title;
-            modalDesc.textContent = category.description;
-            modalProducts.innerHTML = '';
-
-            category.products.forEach(product => {
-                const pEl = document.createElement('div');
-                pEl.className = "bg-white border border-slate-200 p-5 rounded-xl hover:shadow-md transition-shadow flex flex-col justify-between group";
-                pEl.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start mb-2">
-                             <h4 class="text-lg font-bold text-slate-800 leading-tight">${product.title}</h4>
-                             <span class="material-symbols-outlined text-slate-300 group-hover:text-primary transition-colors">verified</span>
-                        </div>
-                        <span class="inline-block bg-slate-100 text-slate-500 text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded mb-3">Ref: ${product.code}</span>
+            document.getElementById('modal-title').textContent = category.title;
+            document.getElementById('modal-desc').textContent = category.description;
+            
+            const productsContainer = document.getElementById('modal-products');
+            productsContainer.innerHTML = category.products.map(product => `
+                <div class="bg-white border border-slate-200 p-4 rounded flex flex-col h-full">
+                    <div class="flex justify-between mb-1">
+                        <h4 class="font-bold text-slate-900">${product.title}</h4>
                     </div>
-                    <div class="pt-3 border-t border-slate-100 mt-2">
-                        <p class="text-sm text-slate-600"><strong>Unidade:</strong> ${product.saleUnit}</p>
+                    <span class="text-xs text-slate-500 font-mono mb-3 block">Ref: ${product.code}</span>
+                    <div class="mt-auto pt-3 border-t border-slate-100">
+                        <p class="text-sm text-slate-700"><span class="font-semibold">Un. Venda:</span> ${product.saleUnit}</p>
                     </div>
-                `;
-                modalProducts.appendChild(pEl);
-            });
+                </div>
+            `).join('');
 
-            // Mostrar Modal (Animações CSS)
             modal.classList.remove('hidden');
-            // Timeout pequeno para permitir que o browser renderize o 'block' antes de aplicar opacidade
             setTimeout(() => {
                 modalBackdrop.classList.remove('opacity-0');
-                modalPanel.classList.remove('opacity-0', 'translate-y-4', 'sm:translate-y-4', 'sm:scale-95');
-                modalPanel.classList.add('opacity-100', 'translate-y-0', 'sm:scale-100');
+                modalPanel.classList.remove('opacity-0', 'translate-y-4');
             }, 10);
             
-            document.body.style.overflow = 'hidden'; // Bloquear scroll do body
+            document.body.style.overflow = 'hidden';
         }
 
         function closeModal() {
-            // Animação de saída
             modalBackdrop.classList.add('opacity-0');
-            modalPanel.classList.remove('opacity-100', 'translate-y-0', 'sm:scale-100');
-            modalPanel.classList.add('opacity-0', 'translate-y-4', 'sm:translate-y-4', 'sm:scale-95');
+            modalPanel.classList.add('opacity-0', 'translate-y-4');
 
             setTimeout(() => {
                 modal.classList.add('hidden');
-                document.body.style.overflow = ''; // Restaurar scroll
-            }, 300); // Tempo da transição
+                document.body.style.overflow = ''; 
+            }, 300);
         }
 
-        // Fechar ao clicar fora
-        modalBackdrop.addEventListener('click', closeModal);
-        
-        // Fechar com ESC
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-                closeModal();
-            }
+            if (e.key === 'Escape' && !modal.classList.contains('hidden')) closeModal();
         });
 
-        // --- MOBILE MENU ---
-        const btn = document.getElementById('mobile-menu-btn');
-        const menu = document.getElementById('mobile-menu');
+        // --- MOBILE MENU TOGGLE ---
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
 
-        btn.addEventListener('click', () => {
-            menu.classList.toggle('hidden');
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
         });
 
-        // Fechar menu ao clicar em link
         document.querySelectorAll('#mobile-menu a').forEach(link => {
             link.addEventListener('click', () => {
-                menu.classList.add('hidden');
+                mobileMenu.classList.add('hidden');
             });
         });
 
-        // --- NAVBAR SCROLL EFFECT ---
         window.addEventListener('scroll', () => {
-            const navInner = document.getElementById('navbar-inner');
-            if (window.scrollY > 50) {
-                navInner.classList.remove('py-3');
-                navInner.classList.add('py-2', 'bg-white/90'); // Mais compacto e fundo mais opaco
+            const header = document.getElementById('header');
+            if (window.scrollY > 20) {
+                header.classList.add('shadow-md');
             } else {
-                navInner.classList.add('py-3');
-                navInner.classList.remove('py-2', 'bg-white/90');
+                header.classList.remove('shadow-md');
             }
         });
+
+        // --- ANIMAÇÃO DOS PEIXES INTERATIVOS (SISTEMA MULTI-AQUÁRIO) ---
+        class FishTank {
+            constructor(canvasId, containerId, fishCount) {
+                this.canvas = document.getElementById(canvasId);
+                this.container = document.getElementById(containerId);
+                if (!this.canvas || !this.container) return;
+                
+                this.ctx = this.canvas.getContext('2d');
+                this.fishCount = fishCount;
+                this.fishes = [];
+                this.width = 0;
+                this.height = 0;
+                this.mouse = { x: -1000, y: -1000 };
+
+                this.init();
+            }
+
+            init() {
+                this.resize();
+                window.addEventListener('resize', () => this.resize());
+
+                window.addEventListener('mousemove', (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    // Verifica se o rato está dentro da área deste canvas específico
+                    if (e.clientX >= rect.left && e.clientX <= rect.right &&
+                        e.clientY >= rect.top && e.clientY <= rect.bottom) {
+                        this.mouse.x = e.clientX - rect.left;
+                        this.mouse.y = e.clientY - rect.top;
+                    } else {
+                        this.mouse.x = -1000;
+                        this.mouse.y = -1000;
+                    }
+                });
+
+                this.container.addEventListener('mouseleave', () => {
+                    this.mouse.x = -1000;
+                    this.mouse.y = -1000;
+                });
+
+                for (let i = 0; i < this.fishCount; i++) {
+                    this.fishes.push(new Fish(this));
+                }
+
+                this.animate();
+            }
+
+            resize() {
+                this.width = this.container.offsetWidth;
+                this.height = this.container.offsetHeight;
+                this.canvas.width = this.width;
+                this.canvas.height = this.height;
+            }
+
+            animate() {
+                this.ctx.clearRect(0, 0, this.width, this.height);
+                this.fishes.forEach(fish => {
+                    fish.update();
+                    fish.draw(this.ctx);
+                });
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        class Fish {
+            constructor(tank) {
+                this.tank = tank;
+                this.x = Math.random() * this.tank.width;
+                this.y = Math.random() * this.tank.height;
+                this.size = Math.random() * 8 + 6; // Tamanho subtil
+                this.baseSpeed = Math.random() * 0.6 + 0.4;
+                this.speed = this.baseSpeed;
+                this.angle = Math.random() * Math.PI * 2;
+                this.color = `rgba(147, 197, 253, 0.45)`; // Azul claro e transparente
+                this.wiggle = Math.random() * Math.PI * 2;
+            }
+
+            update() {
+                // Movimento para a frente
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed;
+
+                // Curvas suaves ocasionais
+                if (Math.random() < 0.05) {
+                    this.angle += (Math.random() - 0.5) * 0.4;
+                }
+
+                // Interação: fugir do rato
+                const dx = this.x - this.tank.mouse.x;
+                const dy = this.y - this.tank.mouse.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < 150) {
+                    const angleToMouse = Math.atan2(dy, dx);
+                    let diff = angleToMouse - this.angle;
+                    
+                    // Normalizar ângulo
+                    while (diff > Math.PI) diff -= Math.PI * 2;
+                    while (diff < -Math.PI) diff += Math.PI * 2;
+
+                    this.angle += diff * 0.08; // Vira suavemente mas rápido
+                    this.speed = Math.min(this.speed + 0.2, this.baseSpeed * 3.5); // Acelera
+                } else {
+                    this.speed = Math.max(this.speed - 0.05, this.baseSpeed); // Volta ao normal
+                }
+
+                // Efeito do ecrã contínuo (Wraparound)
+                const padding = 50;
+                if (this.x < -padding) this.x = this.tank.width + padding;
+                if (this.x > this.tank.width + padding) this.x = -padding;
+                if (this.y < -padding) this.y = this.tank.height + padding;
+                if (this.y > this.tank.height + padding) this.y = -padding;
+
+                // Atualizar o abanar da cauda baseado na velocidade
+                this.wiggle += this.speed * 0.15;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.angle);
+
+                ctx.fillStyle = this.color;
+
+                // Corpo
+                ctx.beginPath();
+                ctx.ellipse(0, 0, this.size, this.size * 0.4, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Cauda com animação (Wiggle)
+                const tailAngle = Math.sin(this.wiggle) * 0.4;
+                ctx.save();
+                ctx.translate(-this.size + 1, 0);
+                ctx.rotate(tailAngle);
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(-this.size * 0.8, -this.size * 0.6);
+                ctx.lineTo(-this.size * 0.8, this.size * 0.6);
+                ctx.fill();
+                ctx.restore();
+
+                ctx.restore();
+            }
+        }
+
+        // Inicializar os peixes nas diferentes secções!
+        new FishTank('fishCanvas', 'hero-section', 35);
+        new FishTank('sectorsFishCanvas', 'sectors', 25);
+        new FishTank('footerFishCanvas', 'footer', 15);
+
     </script>
 </body>
 </html>
